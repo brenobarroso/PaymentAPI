@@ -11,6 +11,6 @@ namespace PaymentAPI.Data
             
         }
 
-        //public DbSet<Payment> Payments { get; set; }
+        public DbSet<Payment> Payments { get; set; }
     }
 }
