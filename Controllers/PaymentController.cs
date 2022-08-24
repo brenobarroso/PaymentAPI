@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +33,32 @@ namespace PaymentAPI.Controllers
             await _context.Payments.AddAsync(payment);
             await _context.SaveChangesAsync();
 
+            if(!ModelState.IsValid)
+                return BadRequest();
+
             return CreatedAtAction(nameof(GetById), new {id = payment.Id}, payment);
+        }
+    }
+
+    public class ValueAttribute : ValidationAttribute // Validação se o valor bruto for passado mas for negativo.
+    {
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            return (float) value < 0 ? new ValidationResult(ErrorMessage="Valor Negativo") : ValidationResult.Success;
+        }
+    }
+
+    public class CardNumberWithEmptyCharAttribute : ValidationAttribute // Validação se possui caracter vazio
+    {
+        public string EmptyChar { get; set; }
+
+        public CardNumberWithEmptyCharAttribute (string eChar)
+        {
+            EmptyChar = eChar;
+        }
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+        {
+            return ((string) value).Contains(EmptyChar)? new ValidationResult("Caracter vazio detectado") : ValidationResult.Success;
         }
     }
 }
