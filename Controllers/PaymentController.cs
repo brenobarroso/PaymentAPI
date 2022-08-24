@@ -24,5 +24,15 @@ namespace PaymentAPI.Controllers
             var payment = await _context.Payments.FindAsync(id);
             return payment == null ? NotFound() : Ok(payment);
         }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<IActionResult> Transaction(Payment payment)
+        {
+            await _context.Payments.AddAsync(payment);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetById), new {id = payment.Id}, payment);
+        }
     }
 }
