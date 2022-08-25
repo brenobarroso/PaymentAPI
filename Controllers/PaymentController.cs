@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Data;
 using PaymentAPI.Models;
+using System;
 
 namespace PaymentAPI.Controllers
 {
@@ -30,11 +31,24 @@ namespace PaymentAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Transaction(Payment payment)
         {
+            // Teste para saber se os modelos passados estão OK.
             if(!ModelState.IsValid)
                 return BadRequest();
-            
+
+            // Teste para saber se número do cartão tem 16 dígitos.
+            if(payment.CardNumber.Length != 16)
+                return BadRequest();
+
+            // Teste para saber se todos os 16 caracteres digitados são números.
+            if(!(payment.CardNumber.All(char.IsDigit)))
+                return BadRequest();
+
+
+            // IF -> transação reprovada por prefixo :: ELSE-> transação aprovada
             if(payment.CardNumber.IndexOf("5999") == 0)
             {
+                string fourLastDigitsOfCardReproved = payment.CardNumber.Substring(payment.CardNumber.Length - 4);
+
                 var reprovedTransaction = new Payment{
                     TransationDate = DateTime.UtcNow,
                     ApprovalDate = null,
@@ -43,7 +57,7 @@ namespace PaymentAPI.Controllers
                     GrossValue = payment.GrossValue,
                     NetValue = payment.NetValue,
                     FlatRate = payment.FlatRate,
-                    CardNumber = payment.CardNumber
+                    CardNumber = fourLastDigitsOfCardReproved
                 };
 
                 await _context.Payments.AddAsync(reprovedTransaction);
@@ -53,6 +67,7 @@ namespace PaymentAPI.Controllers
             }
             else
             {
+                string fourLastDigitsOfCardApproved = payment.CardNumber.Substring(payment.CardNumber.Length - 4);
 
                 var approvedTransation = new Payment{
                     TransationDate = DateTime.UtcNow,
@@ -62,7 +77,7 @@ namespace PaymentAPI.Controllers
                     FlatRate = payment.FlatRate,
                     GrossValue = payment.GrossValue,
                     NetValue = payment.GrossValue - payment.FlatRate,
-                    CardNumber = payment.CardNumber
+                    CardNumber = fourLastDigitsOfCardApproved
                 };
 
                 await _context.Payments.AddAsync(approvedTransation);
@@ -74,6 +89,7 @@ namespace PaymentAPI.Controllers
         }  
     }
 
+    // Validação se o valor bruto da transação existe e não é negativo.
     public class ValueAttribute : ValidationAttribute // Validação se o valor bruto for passado mas for negativo.
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
@@ -84,6 +100,7 @@ namespace PaymentAPI.Controllers
         }
     }
 
+    // Validação se existe espaços em branco.
     public class CardNumberAttribute : ValidationAttribute // Validação se possui caracter vazio
     {
         public string EmptyChar { get; set; }
@@ -96,7 +113,7 @@ namespace PaymentAPI.Controllers
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             return ((string) value).Contains(EmptyChar)
-                ? new ValidationResult("Atenção! Padrão reconhecido e/ou espaço em branco.")
+                ? new ValidationResult("Atenção! Espaço em  detectado.")
                 : ValidationResult.Success;
         }
     }

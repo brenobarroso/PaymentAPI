@@ -22,7 +22,6 @@ namespace PaymentAPI.Models
         public float? FlatRate { get; set; } = 0.9f;// Taxa fixa cobrada
 
         [Required (ErrorMessage = "Atenção, número do cartão não adicionado!")]
-        [StringLength(16, MinimumLength = 16)]
         [CardNumberAttribute(eChar:" ")]
         public string CardNumber { get; set; } = " ";// 4 ultimos digitos do cartão
 
