@@ -28,7 +28,7 @@ namespace PaymentAPI.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Transaction(Payment payment)
         {
             // Teste para saber se os modelos passados estão OK.
