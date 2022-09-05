@@ -23,6 +23,7 @@ namespace PaymentAPI.Models
 
         [Required (ErrorMessage = "Atenção, número do cartão não adicionado!")]
         [CardNumberAttribute(eChar:" ")]
+        [ValueAttribute]
         public string CardNumber { get; set; } = " ";// 4 ultimos digitos do cartão
 
     }
