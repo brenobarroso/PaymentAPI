@@ -34,27 +34,32 @@ namespace PaymentApiTest.Controllers
             var paymentAPIController = new PaymentController(_context);
 
 
-            var payment = new Payment{
+            var payment = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "1023654785698745"
             };
 
-            var payment2 = new Payment{
+            var payment2 = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "1023654787498745"
             };
 
-            var payment3 = new Payment{
+            var payment3 = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "1023054785698025"
             };
 
-            var payment4 = new Payment{
+            var payment4 = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "102365478569825"
             };
 
-            var payment5 = new Payment{
+            var payment5 = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "1023654485698025"
             };
@@ -73,7 +78,7 @@ namespace PaymentApiTest.Controllers
             // Assert
 
             Assert.Equal(200, result.StatusCode);
-            
+
         }
 
         [Theory]
@@ -88,27 +93,32 @@ namespace PaymentApiTest.Controllers
 
             var paymentController = new PaymentController(_context);
 
-                        var payment = new Payment{
+            var payment = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "1023654785698745"
             };
 
-            var payment2 = new Payment{
+            var payment2 = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "1023654787498745"
             };
 
-            var payment3 = new Payment{
+            var payment3 = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "1023054785698025"
             };
 
-            var payment4 = new Payment{
+            var payment4 = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "102365478569825"
             };
 
-            var payment5 = new Payment{
+            var payment5 = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "1023654485698025"
             };
@@ -141,27 +151,32 @@ namespace PaymentApiTest.Controllers
 
             var paymentController = new PaymentController(_context);
 
-                        var payment = new Payment{
+            var payment = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "1023654785698745"
             };
 
-            var payment2 = new Payment{
+            var payment2 = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "1023654787498745"
             };
 
-            var payment3 = new Payment{
+            var payment3 = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "1023054785698025"
             };
 
-            var payment4 = new Payment{
+            var payment4 = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "102365478569825"
             };
 
-            var payment5 = new Payment{
+            var payment5 = new Payment
+            {
                 GrossValue = 5000f,
                 CardNumber = "1023654485698025"
             };
@@ -186,21 +201,25 @@ namespace PaymentApiTest.Controllers
         public async Task TransactionShouldBeApproved(int grossValue, string cardNumber)
         {
             // Arrange
+            var paymentController = new PaymentController(_context);
 
-            var paymentController= new PaymentController(_context);
-
-            var payment = new Payment{
+            var viewModel = new Payment
+            {
                 GrossValue = grossValue,
                 CardNumber = cardNumber
             };
 
             // Act
 
-            var result = (OkResult)await paymentController.Transaction(payment);
+            var result = (OkResult)await paymentController.Transaction(viewModel);
+
+            var payments = await _context.Payments.ToListAsync();
 
             // Assert
-
             Assert.Equal(200, result.StatusCode);
+            Assert.Single(payments);
+            Assert.Equal(viewModel.GrossValue, payments.First().GrossValue);
+            Assert.Equal(DateTime.UtcNow.Date, payments.First().TransationDate.Date);
         }
 
         [Theory]
@@ -209,9 +228,10 @@ namespace PaymentApiTest.Controllers
         {
             // Arrange
 
-            var paymentController= new PaymentController(_context);
+            var paymentController = new PaymentController(_context);
 
-            var payment = new Payment{
+            var payment = new Payment
+            {
                 GrossValue = grossValue,
                 CardNumber = cardNumber
             };
@@ -239,9 +259,10 @@ namespace PaymentApiTest.Controllers
         {
             // Arrange
 
-            var paymentController= new PaymentController(_context);
+            var paymentController = new PaymentController(_context);
 
-            var payment = new Payment{
+            var payment = new Payment
+            {
                 GrossValue = grossValue,
                 CardNumber = cardNumber
             };
