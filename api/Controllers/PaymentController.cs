@@ -28,7 +28,11 @@ namespace PaymentAPI.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var payment = await _context.Payments.FindAsync(id);
-            return payment == null ? NotFound() : Ok(payment);
+
+            if(payment == null)
+                return NotFound();
+            else
+                return Ok(payment);
         }
 
         [HttpPost]
@@ -98,7 +102,7 @@ namespace PaymentAPI.Controllers
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            return (float) value < 0 || (float) value == null 
+            return value == null || (float)value <= 0  
                 ? new ValidationResult(ErrorMessage="Valor Negativo") 
                 : ValidationResult.Success;
         }
