@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using api.Validations;
 using PaymentAPI.Controllers;
 
 namespace PaymentAPI.Models
@@ -18,12 +19,11 @@ namespace PaymentAPI.Models
         public float GrossValue { get; set; } // Valor bruto da transação
         public float? NetValue { get; set; } = null; // Valor líquido da transação (descontado taxa)
 
-        [Required (ErrorMessage = "Atenção, taxa não adicionada!")]
+        [Required(ErrorMessage = "Atenção, taxa não adicionada!")]
         public float? FlatRate { get; set; } = 0.9f;// Taxa fixa cobrada
 
-        [Required (ErrorMessage = "Atenção, número do cartão não adicionado!")]
-        [CardNumberAttribute(eChar:" ")]
-        [ValueAttribute]
+        [Required(ErrorMessage = "Atenção, número do cartão não adicionado!")]
+        [CardNumberAttribute(eChar: " ")]
         public string CardNumber { get; set; } = " ";// 4 ultimos digitos do cartão
 
     }

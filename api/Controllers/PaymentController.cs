@@ -21,7 +21,7 @@ namespace PaymentAPI.Controllers
             var payments = await _context.Payments.ToListAsync();
             return Ok(payments);
         }
-        
+
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Payment), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -29,7 +29,7 @@ namespace PaymentAPI.Controllers
         {
             var payment = await _context.Payments.FindAsync(id);
 
-            if(payment == null)
+            if (payment == null)
                 return NotFound();
             else
                 return Ok(payment);
@@ -40,24 +40,25 @@ namespace PaymentAPI.Controllers
         public async Task<IActionResult> Transaction(Payment payment)
         {
             // Teste para saber se os modelos passados estão OK.
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest();
 
             // Teste para saber se número do cartão tem 16 dígitos.
-            if(payment.CardNumber.Length != 16)
+            if (payment.CardNumber.Length != 16)
                 return BadRequest();
 
             // Teste para saber se todos os 16 caracteres digitados são números.
-            if(!(payment.CardNumber.All(char.IsDigit)))
+            if (!(payment.CardNumber.All(char.IsDigit)))
                 return BadRequest();
 
 
             // IF -> transação reprovada por prefixo :: ELSE-> transação aprovada
-            if(payment.CardNumber.IndexOf("5999") == 0)
+            if (payment.CardNumber.IndexOf("5999") == 0)
             {
                 string fourLastDigitsOfCardReproved = payment.CardNumber.Substring(payment.CardNumber.Length - 4);
 
-                var reprovedTransaction = new Payment{
+                var reprovedTransaction = new Payment
+                {
                     TransationDate = DateTime.UtcNow,
                     ApprovalDate = null,
                     DisapprovalDate = DateTime.UtcNow,
@@ -77,7 +78,8 @@ namespace PaymentAPI.Controllers
             {
                 string fourLastDigitsOfCardApproved = payment.CardNumber.Substring(payment.CardNumber.Length - 4);
 
-                var approvedTransation = new Payment{
+                var approvedTransation = new Payment
+                {
                     TransationDate = DateTime.UtcNow,
                     ApprovalDate = DateTime.UtcNow,
                     DisapprovalDate = null,
@@ -94,35 +96,6 @@ namespace PaymentAPI.Controllers
                 return Ok();
 
             }
-        }  
-    }
-
-    // Validação se o valor bruto da transação existe e não é negativo.
-    public class ValueAttribute : ValidationAttribute // Validação se o valor bruto for passado mas for negativo.
-    {
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
-        {
-            return value == null || (float)value <= 0  
-                ? new ValidationResult(ErrorMessage="Valor Negativo") 
-                : ValidationResult.Success;
-        }
-    }
-
-    // Validação se existe espaços em branco.
-    public class CardNumberAttribute : ValidationAttribute // Validação se possui caracter vazio
-    {
-        public string EmptyChar { get; set; }
-
-        public CardNumberAttribute (string eChar)
-        {
-            EmptyChar = eChar;
-        }
-
-        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
-        {
-            return ((string) value).Contains(EmptyChar)
-                ? new ValidationResult("Atenção! Espaço em  detectado.")
-                : ValidationResult.Success;
         }
     }
 }
