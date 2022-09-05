@@ -16,7 +16,11 @@ namespace PaymentAPI.Controllers
         public PaymentController(PaymentDbContext context) => _context = context;
 
         [HttpGet]
-        public async Task<IEnumerable<Payment>> Get() => await _context.Payments.ToListAsync();
+        public async Task<IActionResult> Get()
+        {
+            var payments = await _context.Payments.ToListAsync();
+            return Ok(payments);
+        }
         
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Payment), StatusCodes.Status200OK)]
