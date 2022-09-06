@@ -198,6 +198,7 @@ namespace PaymentApiTest.Controllers
 
         [Theory]
         [InlineData(5000f, "5630125478536540")]
+        [InlineData(5000f, "0000599978536540")]
         public async Task TransactionShouldBeApproved(int grossValue, string cardNumber)
         {
             // Arrange
