@@ -225,6 +225,7 @@ namespace PaymentApiTest.Controllers
             Assert.NotNull(payments.First().ApprovalDate);
             Assert.Null(payments.First().DisapprovalDate);
             Assert.Equal(true, payments.First().Confirmation);
+            Assert.Equal(4, payments.First().CardNumber.Length);
         }
 
         [Theory]
@@ -260,6 +261,7 @@ namespace PaymentApiTest.Controllers
             Assert.NotNull(payments.First().DisapprovalDate);
             Assert.Equal(false, payments.First().Confirmation);
             Assert.NotNull(payments.First().FlatRate);
+            Assert.Equal(4, payments.First().CardNumber.Length);
 
         }
 
