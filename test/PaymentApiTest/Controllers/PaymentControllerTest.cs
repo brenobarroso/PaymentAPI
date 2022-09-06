@@ -215,11 +215,16 @@ namespace PaymentApiTest.Controllers
 
             var payments = await _context.Payments.ToListAsync();
 
-            // Assert
             Assert.Equal(200, result.StatusCode);
             Assert.Single(payments);
             Assert.Equal(viewModel.GrossValue, payments.First().GrossValue);
+            Assert.Equal((grossValue - viewModel.FlatRate), payments.First().NetValue);
             Assert.Equal(DateTime.UtcNow.Date, payments.First().TransationDate.Date);
+            Assert.Equal(DateTime.UtcNow.Date, payments.First().ApprovalDate.Value.Date);
+            Assert.NotNull(payments.First().FlatRate);
+            Assert.NotNull(payments.First().ApprovalDate);
+            Assert.Null(payments.First().DisapprovalDate);
+            Assert.Equal(true, payments.First().Confirmation);
         }
 
         [Theory]
@@ -230,7 +235,7 @@ namespace PaymentApiTest.Controllers
 
             var paymentController = new PaymentController(_context);
 
-            var payment = new Payment
+            var viewModel = new Payment
             {
                 GrossValue = grossValue,
                 CardNumber = cardNumber
@@ -238,11 +243,24 @@ namespace PaymentApiTest.Controllers
 
             // Act
 
-            var result = (OkResult)await paymentController.Transaction(payment);
+            var result = (OkResult)await paymentController.Transaction(viewModel);
+
+            var payments = await _context.Payments.ToListAsync();
+
 
             // Assert
 
             Assert.Equal(200, result.StatusCode);
+            Assert.Single(payments);
+            Assert.Equal(viewModel.GrossValue, payments.First().GrossValue);
+            Assert.Null(payments.First().NetValue);
+            Assert.Equal(DateTime.UtcNow.Date, payments.First().TransationDate.Date);
+            Assert.Equal(DateTime.UtcNow.Date, payments.First().DisapprovalDate.Value.Date);
+            Assert.Null(payments.First().ApprovalDate);
+            Assert.NotNull(payments.First().DisapprovalDate);
+            Assert.Equal(false, payments.First().Confirmation);
+            Assert.NotNull(payments.First().FlatRate);
+
         }
 
         [Theory]
