@@ -6,12 +6,12 @@ using PaymentAPI.Data;
 using PaymentAPI.Models;
 using System;
 
-namespace api.Controllers;
+namespace PaymentAPI.Validations;
 
-public class PaymentValidations
+public class TransactionsValidations
 {
 
-    public (Payment, bool) Validations(Payment payment)
+    public static (Payment payment, bool sucess) Validation(Payment payment)
     {
         if (payment.CardNumber.Length != 16)
             return (payment, false);
