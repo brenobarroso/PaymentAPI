@@ -23,7 +23,6 @@ public class TransactionsValidationsTest
     [InlineData(5000f, "1023654787498745")]
     [InlineData(5000f, "1023054785697725")]
     [InlineData(5000f, "1027754485698025")]
-    
     public void ShouldConvertToApproved(float grossValue, string cardNumber)
     {
         // Arrange
@@ -53,4 +52,35 @@ public class TransactionsValidationsTest
 
     }
 
+    [Theory]
+    [InlineData(5000f, "5999654785698745")]
+    [InlineData(5000f, "5999654785698785")]
+    [InlineData(5000f, "5999654775698745")]
+    public void ShouldConvertToReproved(float grossValue, string cardNumber)
+    {
+        // Arrange
+
+        var payment = new Payment
+        {
+            GrossValue = grossValue,
+            CardNumber = cardNumber
+        };
+
+        // Act
+
+        var result = TransactionsValidations.Validation(payment);
+
+        // Assert
+
+        Assert.Equal(true, result.sucess);
+        Assert.Equal(4, result.payment.CardNumber.Length);
+        Assert.Equal(grossValue, result.payment.GrossValue);
+        Assert.Null(result.payment.NetValue);
+        Assert.Equal(DateTime.UtcNow.Date, result.payment.TransationDate.Date);
+        Assert.Equal(DateTime.UtcNow.Date, result.payment.DisapprovalDate.Value.Date);
+        Assert.NotNull(result.payment.FlatRate);
+        Assert.Null(result.payment.ApprovalDate);
+        Assert.NotNull(result.payment.DisapprovalDate);
+        Assert.Equal(false, result.payment.Confirmation);
+    }
 }
