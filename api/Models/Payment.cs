@@ -24,6 +24,7 @@ public class Payment
 
     [Required(ErrorMessage = "Atenção, número do cartão não adicionado!")]
     [CardNumberAttribute(eChar: " ")]
+    [CardNumberPatternAttribute]
     public string CardNumber { get; set; } = " ";// 4 ultimos digitos do cartão
 
 }

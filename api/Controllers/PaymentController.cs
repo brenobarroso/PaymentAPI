@@ -39,18 +39,6 @@ public class PaymentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Transaction(Payment payment)
     {
-        // Teste para saber se os modelos passados estão OK.
-        if (!ModelState.IsValid)
-            return BadRequest();
-
-        // Teste para saber se número do cartão tem 16 dígitos.
-        if (payment.CardNumber.Length != 16)
-            return BadRequest();
-
-        // Teste para saber se todos os 16 caracteres digitados são números.
-        if (!(payment.CardNumber.All(char.IsDigit)))
-            return BadRequest();
-
 
         // IF -> transação reprovada por prefixo :: ELSE-> transação aprovada
         if (payment.CardNumber.IndexOf("5999") == 0)

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Data;
 using PaymentAPI.Models;
+
 using System;
 
 namespace PaymentAPI.Validations;
@@ -13,13 +14,6 @@ public class TransactionsValidations
 
     public static (Payment payment, bool sucess) Validation(Payment payment)
     {
-        if (payment.CardNumber.Length != 16)
-            return (payment, false);
-
-        if (!(payment.CardNumber.All(char.IsDigit)))
-            return (payment, false);
-
-
         if (payment.CardNumber.IndexOf("5999") == 0)
         {
             string fourLastDigitsOfCardReproved = payment.CardNumber.Substring(payment.CardNumber.Length - 4);
@@ -56,4 +50,3 @@ public class TransactionsValidations
         }
     }
 }
-

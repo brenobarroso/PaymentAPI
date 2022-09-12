@@ -83,4 +83,32 @@ public class TransactionsValidationsTest
         Assert.NotNull(result.payment.DisapprovalDate);
         Assert.Equal(false, result.payment.Confirmation);
     }
+
+    [Theory]
+    [InlineData(5000f, "599965478569874")]
+    [InlineData(5000f, "59996547856987450")]
+    [InlineData(5000f, "599965478569874a")]
+    [InlineData(5000f, "59996547856987!5")]
+    [InlineData(5000f, "599965478569874 ")]
+    [InlineData(0f, "5999654785698745")]
+    [InlineData(-5000f, "5999654785698745")]
+    public void ShouldReturnFalseSucess(float grossValue, string cardNumber)
+    {
+        // Arrange
+
+        var payment = new Payment
+        {
+            GrossValue = grossValue,
+            CardNumber = cardNumber
+        };
+
+        // Act
+
+        var result = TransactionsValidations.Validation(payment);
+
+        // Assert
+
+        Assert.Equal(false, result.sucess);
+
+    }
 }
