@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI;
@@ -27,7 +28,7 @@ public class TransactionsValidationsTest
     {
         // Arrange
 
-        var payment = new Payment
+        var payment = new PaymentViewModel
         {
             GrossValue = grossValue,
             CardNumber = cardNumber
@@ -35,7 +36,7 @@ public class TransactionsValidationsTest
 
         // Act
 
-        var result = TransactionsValidations.Validation(payment);
+        var result = TransactionsManager.Validation(payment);
 
         // Assert
 
@@ -60,7 +61,7 @@ public class TransactionsValidationsTest
     {
         // Arrange
 
-        var payment = new Payment
+        var payment = new PaymentViewModel
         {
             GrossValue = grossValue,
             CardNumber = cardNumber
@@ -68,7 +69,7 @@ public class TransactionsValidationsTest
 
         // Act
 
-        var result = TransactionsValidations.Validation(payment);
+        var result = TransactionsManager.Validation(payment);
 
         // Assert
 
@@ -96,7 +97,7 @@ public class TransactionsValidationsTest
     {
         // Arrange
 
-        var payment = new Payment
+        var payment = new PaymentViewModel
         {
             GrossValue = grossValue,
             CardNumber = cardNumber
@@ -104,7 +105,7 @@ public class TransactionsValidationsTest
 
         // Act
 
-        var result = TransactionsValidations.Validation(payment);
+        var result = TransactionsManager.Validation(payment);
 
         // Assert
 

@@ -6,17 +6,18 @@ using PaymentAPI.Data;
 using PaymentAPI.Models;
 
 using System;
+using api.Models;
 
 namespace PaymentAPI.Validations;
 
-public class TransactionsValidations
+public class TransactionsManager
 {
 
-    public static (Payment payment, bool sucess) Validation(Payment payment)
+    public static (Payment payment, bool sucess) Validation(PaymentViewModel viewModel)
     {
-        if (payment.CardNumber.IndexOf("5999") == 0)
+        if (viewModel.CardNumber.IndexOf("5999") == 0)
         {
-            string fourLastDigitsOfCardReproved = payment.CardNumber.Substring(payment.CardNumber.Length - 4);
+            string fourLastDigitsOfCardReproved = viewModel.CardNumber.Substring(viewModel.CardNumber.Length - 4);
 
             var reprovedTransaction = new Payment
             {
@@ -24,16 +25,15 @@ public class TransactionsValidations
                 ApprovalDate = null,
                 DisapprovalDate = DateTime.UtcNow,
                 Confirmation = false,
-                GrossValue = payment.GrossValue,
-                NetValue = payment.NetValue,
-                FlatRate = payment.FlatRate,
+                GrossValue = viewModel.GrossValue,
+                NetValue = null,
                 CardNumber = fourLastDigitsOfCardReproved
             };
             return (reprovedTransaction, true);
         }
         else
         {
-            string fourLastDigitsOfCardApproved = payment.CardNumber.Substring(payment.CardNumber.Length - 4);
+            string fourLastDigitsOfCardApproved = viewModel.CardNumber.Substring(viewModel.CardNumber.Length - 4);
 
             var approvedTransation = new Payment
             {
@@ -41,11 +41,10 @@ public class TransactionsValidations
                 ApprovalDate = DateTime.UtcNow,
                 DisapprovalDate = null,
                 Confirmation = true,
-                FlatRate = payment.FlatRate,
-                GrossValue = payment.GrossValue,
-                NetValue = payment.GrossValue - payment.FlatRate,
+                GrossValue = viewModel.GrossValue,
                 CardNumber = fourLastDigitsOfCardApproved
             };
+            approvedTransation.NetValue = approvedTransation.GrossValue - approvedTransation.FlatRate;
             return (approvedTransation, true);
         }
     }

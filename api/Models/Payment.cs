@@ -15,16 +15,13 @@ public class Payment
     public DateTime? DisapprovalDate { get; set; } = null;// Data de reprovação (caso ocorra)
     public bool Confirmation { get; set; } // Confirmação da adquirente
     [Required]
-    [ValueAttribute]
     public float GrossValue { get; set; } // Valor bruto da transação
     public float? NetValue { get; set; } = null; // Valor líquido da transação (descontado taxa)
 
-    [Required(ErrorMessage = "Atenção, taxa não adicionada!")]
+    [Required]
     public float? FlatRate { get; set; } = 0.9f;// Taxa fixa cobrada
 
-    [Required(ErrorMessage = "Atenção, número do cartão não adicionado!")]
-    [CardNumberAttribute(eChar: " ")]
-    [CardNumberPatternAttribute]
+    [Required]
     public string CardNumber { get; set; } = " ";// 4 ultimos digitos do cartão
 
 }

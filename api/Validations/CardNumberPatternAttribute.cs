@@ -11,10 +11,10 @@ namespace api.Validations
 
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
-            var cardLength = ((string)value).Length != 16;
-            var cardDigits = ((string)value).All(char.IsDigit);
+            var cardLengthInvalid = ((string)value).Length != 16;
+            var cardDigitsInvalid = !((string)value).All(char.IsDigit);
             
-            return cardDigits == true || cardLength == false
+            return cardDigitsInvalid == true || cardLengthInvalid == true
                     ? new ValidationResult("Atenção! Padrão inválido.")
                     : ValidationResult.Success;
         }

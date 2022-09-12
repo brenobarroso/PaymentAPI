@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI;
@@ -145,7 +146,7 @@ public class PaymentControllerTest
     [InlineData(6)]
     [InlineData(30)]
     [InlineData(10)]
-    public async Task ShouldListAnNotExistentId(int id)
+    public async Task ShouldNotListANotExistentId(int id)
     {
         // Arrange
 
@@ -204,7 +205,7 @@ public class PaymentControllerTest
         // Arrange
         var paymentController = new PaymentController(_context);
 
-        var viewModel = new Payment
+        var viewModel = new PaymentViewModel
         {
             GrossValue = grossValue,
             CardNumber = cardNumber
@@ -219,7 +220,7 @@ public class PaymentControllerTest
         Assert.Equal(200, result.StatusCode);
         Assert.Single(payments);
         Assert.Equal(viewModel.GrossValue, payments.First().GrossValue);
-        Assert.Equal((grossValue - viewModel.FlatRate), payments.First().NetValue);
+        Assert.Equal((grossValue - payments.First().FlatRate), payments.First().NetValue);
         Assert.Equal(DateTime.UtcNow.Date, payments.First().TransationDate.Date);
         Assert.Equal(DateTime.UtcNow.Date, payments.First().ApprovalDate.Value.Date);
         Assert.NotNull(payments.First().FlatRate);
@@ -237,7 +238,7 @@ public class PaymentControllerTest
 
         var paymentController = new PaymentController(_context);
 
-        var viewModel = new Payment
+        var viewModel = new PaymentViewModel
         {
             GrossValue = grossValue,
             CardNumber = cardNumber
@@ -282,7 +283,7 @@ public class PaymentControllerTest
 
         var paymentController = new PaymentController(_context);
 
-        var payment = new Payment
+        var payment = new PaymentViewModel
         {
             GrossValue = grossValue,
             CardNumber = cardNumber
