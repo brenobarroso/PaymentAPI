@@ -1,3 +1,4 @@
+using api.Models;
 using PaymentAPI.Models;
 
 namespace PaymentApiTest.Models;
@@ -11,7 +12,7 @@ public class PaymentTests
     public void PaymentIsValid(int grossValue, string cardNumber)
     {
         // Arrange
-        var payment = new Payment
+        var payment = new PaymentViewModel
         {
             GrossValue = grossValue,
             CardNumber = cardNumber
@@ -28,11 +29,11 @@ public class PaymentTests
     [InlineData(0f, "0000000000000000")]
     [InlineData(-100f, "0000000000000000")]
     [InlineData(null, "0000000000000000")]
-    [InlineData(100, "00000 0000000000")]
+    [InlineData(100f, "00000 0000000000")]
     public void PaymentIsNotValid(int grossValue, string cardNumber)
     {
         // Arrange
-        var payment = new Payment
+        var payment = new PaymentViewModel
         {
             GrossValue = grossValue,
             CardNumber = cardNumber
@@ -42,6 +43,6 @@ public class PaymentTests
         var errors = TestModelHelper.Validate(payment);
 
         // Assert
-        Assert.Single(errors);
+        Assert.NotNull(errors);
     }
 }

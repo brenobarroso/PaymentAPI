@@ -266,35 +266,4 @@ public class PaymentControllerTest
         Assert.Equal(4, payments.First().CardNumber.Length);
 
     }
-
-    [Theory]
-    // [InlineData(0f, "0000000000000000")]
-    // [InlineData(-100f, "0000000000000000")]
-    // [InlineData(null, "0000000000000000")]
-    [InlineData(1f, "0000")]
-    [InlineData(1f, "00000000000000000")]
-    [InlineData(1f, "000000000000000 0")]
-    [InlineData(1f, "000000000000000a")]
-    [InlineData(1f, "0000000000000!00")]
-    [InlineData(1f, "01254703h!023654")]
-    public async Task TransactionCannotBeMade(int grossValue, string cardNumber)
-    {
-        // Arrange
-
-        var paymentController = new PaymentController(_context);
-
-        var payment = new PaymentViewModel
-        {
-            GrossValue = grossValue,
-            CardNumber = cardNumber
-        };
-
-        // Act
-
-        var result = (BadRequestResult)await paymentController.Transaction(payment);
-
-        // Assert
-
-        Assert.Equal(400, result.StatusCode);
-    }
 }

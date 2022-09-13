@@ -29,23 +29,22 @@ public class TransactionsManager
                 NetValue = null,
                 CardNumber = fourLastDigitsOfCardReproved
             };
-            return (reprovedTransaction, true);
+            return (reprovedTransaction, false);
         }
-        else
-        {
-            string fourLastDigitsOfCardApproved = viewModel.CardNumber.Substring(viewModel.CardNumber.Length - 4);
+        
+        string fourLastDigitsOfCardApproved = viewModel.CardNumber.Substring(viewModel.CardNumber.Length - 4);
 
-            var approvedTransation = new Payment
-            {
-                TransationDate = DateTime.UtcNow,
-                ApprovalDate = DateTime.UtcNow,
-                DisapprovalDate = null,
-                Confirmation = true,
-                GrossValue = viewModel.GrossValue,
-                CardNumber = fourLastDigitsOfCardApproved
-            };
-            approvedTransation.NetValue = approvedTransation.GrossValue - approvedTransation.FlatRate;
-            return (approvedTransation, true);
-        }
+        var approvedTransation = new Payment
+        {
+            TransationDate = DateTime.UtcNow,
+            ApprovalDate = DateTime.UtcNow,
+            DisapprovalDate = null,
+            Confirmation = true,
+            GrossValue = viewModel.GrossValue,
+            CardNumber = fourLastDigitsOfCardApproved
+        };
+        approvedTransation.NetValue = approvedTransation.GrossValue - approvedTransation.FlatRate;
+        
+        return (approvedTransation, true);
     }
 }

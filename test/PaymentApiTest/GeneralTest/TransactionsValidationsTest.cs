@@ -73,7 +73,7 @@ public class TransactionsValidationsTest
 
         // Assert
 
-        Assert.Equal(true, result.sucess);
+        Assert.Equal(false, result.sucess);
         Assert.Equal(4, result.payment.CardNumber.Length);
         Assert.Equal(grossValue, result.payment.GrossValue);
         Assert.Null(result.payment.NetValue);
