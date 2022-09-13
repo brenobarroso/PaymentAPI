@@ -1,20 +1,24 @@
-using System;
-using System.Linq;
-using System.Threading;
 using api.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PaymentAPI;
-using PaymentAPI.Controllers;
 using PaymentAPI.Data;
-using PaymentAPI.Models;
 using PaymentAPI.Validations;
-using Xunit;
 
 namespace PaymentApiTest.Validations;
 
 public class TransactionsManagerTest
 {
+    protected readonly PaymentDbContext _context;
+    public TransactionsManagerTest()
+    {
+        var options = new DbContextOptionsBuilder<PaymentDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+
+        _context = new PaymentDbContext(options);
+
+        _context.Database.EnsureCreated();
+    }
+
     [Theory]
     [InlineData(5000f, "1023654785698745")]
     [InlineData(5000f, "1023654787498745")]
@@ -24,7 +28,7 @@ public class TransactionsManagerTest
     [InlineData(5000f, "1023654787498745")]
     [InlineData(5000f, "1023054785697725")]
     [InlineData(5000f, "1027754485698025")]
-    public void ShouldConvertToApproved(float grossValue, string cardNumber)
+    public async Task ShouldConvertToApproved(float grossValue, string cardNumber)
     {
         // Arrange
 
@@ -34,9 +38,11 @@ public class TransactionsManagerTest
             CardNumber = cardNumber
         };
 
+        var manager = new TransactionsManager(_context);
+
         // Act
 
-        var result = TransactionsManager.Validation(payment);
+        var result = await manager.CreatAsync(payment);
 
         // Assert
 
@@ -57,7 +63,7 @@ public class TransactionsManagerTest
     [InlineData(5000f, "5999654785698745")]
     [InlineData(5000f, "5999654785698785")]
     [InlineData(5000f, "5999654775698745")]
-    public void ShouldConvertToReproved(float grossValue, string cardNumber)
+    public async Task ShouldConvertToReprovedAsync(float grossValue, string cardNumber)
     {
         // Arrange
 
@@ -67,9 +73,11 @@ public class TransactionsManagerTest
             CardNumber = cardNumber
         };
 
+        var manager = new TransactionsManager(_context);
+
         // Act
 
-        var result = TransactionsManager.Validation(payment);
+        var result = await manager.CreatAsync(payment);
 
         // Assert
 
@@ -93,7 +101,7 @@ public class TransactionsManagerTest
     [InlineData(5000f, "599965478569874 ")]
     [InlineData(0f, "5999654785698745")]
     [InlineData(-5000f, "5999654785698745")]
-    public void ShouldReturnFalseSucess(float grossValue, string cardNumber)
+    public async Task ShouldReturnFalseSucessAsync(float grossValue, string cardNumber)
     {
         // Arrange
 
@@ -103,9 +111,11 @@ public class TransactionsManagerTest
             CardNumber = cardNumber
         };
 
+        var manager = new TransactionsManager(_context);
+
         // Act
 
-        var result = TransactionsManager.Validation(payment);
+        var result = await manager.CreatAsync(payment);
 
         // Assert
 
