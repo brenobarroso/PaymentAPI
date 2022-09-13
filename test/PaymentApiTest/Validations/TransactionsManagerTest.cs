@@ -11,7 +11,7 @@ using PaymentAPI.Models;
 using PaymentAPI.Validations;
 using Xunit;
 
-namespace PaymentApiTest.GeneralTest;
+namespace PaymentApiTest.Validations;
 
 public class TransactionsManagerTest
 {
