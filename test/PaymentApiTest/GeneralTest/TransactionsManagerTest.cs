@@ -13,7 +13,7 @@ using Xunit;
 
 namespace PaymentApiTest.GeneralTest;
 
-public class TransactionsValidationsTest
+public class TransactionsManagerTest
 {
     [Theory]
     [InlineData(5000f, "1023654785698745")]
