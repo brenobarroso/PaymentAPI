@@ -14,13 +14,20 @@ namespace PaymentAPI.Controllers;
 [ApiController]
 public class PaymentController : ControllerBase
 {
-    private readonly PaymentDbContext _context;
-    public PaymentController(PaymentDbContext context) => _context = context;
+
+    //private readonly PaymentDbContext _context;
+
+    private readonly TransactionsManager _manager;
+
+    public PaymentController(TransactionsManager manager)
+    {
+        _manager = manager;
+    }
 
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        var payments = await _context.Payments.ToListAsync();
+        var payments = await _manager.getAllAsync();
         return Ok(payments);
     }
 
@@ -29,7 +36,7 @@ public class PaymentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(int id)
     {
-        var payment = await _context.Payments.FindAsync(id);
+        var payment = await _manager.getByIdAsync(id);
 
         if (payment == null)
             return NotFound();
@@ -41,16 +48,11 @@ public class PaymentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Transaction(PaymentViewModel viewModel)
     {
-        var result = TransactionsManager.Validation(viewModel);
+        var result = await _manager.CreatAsync(viewModel);
 
         if (result.sucess)
-        {
-            await _context.Payments.AddAsync(result.payment);
-            await _context.SaveChangesAsync();
-
             return Ok(result.payment);
-        }
-        
+
         return UnprocessableEntity("payment reproved");
     }
 }

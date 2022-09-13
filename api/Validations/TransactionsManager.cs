@@ -12,8 +12,25 @@ namespace PaymentAPI.Validations;
 
 public class TransactionsManager
 {
+    private readonly PaymentDbContext _context;
+    public TransactionsManager(PaymentDbContext context) => _context = context;
 
-    public static (Payment payment, bool sucess) Validation(PaymentViewModel viewModel)
+    public async Task<List<Payment>> getAllAsync()
+    {
+        var result = await _context.Payments.ToListAsync();
+        return result;
+    }
+
+    public async Task<Payment?> getByIdAsync(int id)
+    {
+        var result = await _context.Payments.FindAsync(id);
+        if (result == null)
+            return null;
+
+        return result;
+    }
+
+    public async Task<(Payment payment, bool sucess)> CreatAsync(PaymentViewModel viewModel)
     {
         if (viewModel.CardNumber.IndexOf("5999") == 0)
         {
@@ -29,9 +46,13 @@ public class TransactionsManager
                 NetValue = null,
                 CardNumber = fourLastDigitsOfCardReproved
             };
+
+            await _context.Payments.AddAsync(reprovedTransaction);
+            await _context.SaveChangesAsync();
+
             return (reprovedTransaction, false);
         }
-        
+
         string fourLastDigitsOfCardApproved = viewModel.CardNumber.Substring(viewModel.CardNumber.Length - 4);
 
         var approvedTransation = new Payment
@@ -44,7 +65,10 @@ public class TransactionsManager
             CardNumber = fourLastDigitsOfCardApproved
         };
         approvedTransation.NetValue = approvedTransation.GrossValue - approvedTransation.FlatRate;
-        
+
+        await _context.Payments.AddAsync(approvedTransation);
+        await _context.SaveChangesAsync();
+
         return (approvedTransation, true);
     }
 }
