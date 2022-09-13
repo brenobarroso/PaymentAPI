@@ -43,14 +43,14 @@ public class PaymentController : ControllerBase
     {
         var result = TransactionsManager.Validation(viewModel);
 
-        if (result.sucess == true || result.sucess == false)
+        if (result.sucess)
         {
             await _context.Payments.AddAsync(result.payment);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(result.payment);
         }
         
-        return BadRequest();
+        return UnprocessableEntity("payment reproved");
     }
 }

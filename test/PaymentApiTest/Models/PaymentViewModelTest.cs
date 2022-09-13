@@ -10,19 +10,12 @@ namespace PaymentApiTest.Models;
 public class PaymentViewModelTest
 {
     [Theory]
-    // [InlineData(0f, "0000000000000000")]
-    // [InlineData(-100f, "0000000000000000")]
-    // [InlineData(null, "0000000000000000")]
-    [InlineData(1f, "0000")]
-    [InlineData(1f, "00000000000000000")]
-    [InlineData(1f, "000000000000000 0")]
-    [InlineData(1f, "000000000000000a")]
-    [InlineData(1f, "0000000000000!00")]
-    [InlineData(1f, "01254703h!023654")]
-    public void TransactionCannotBeMade(int grossValue, string cardNumber)
+    [InlineData(1f, "0000000000000000")]
+    [InlineData(100f, "0000000000000000")]
+    [InlineData(1.5f, "0000000000000000")]
+    public void PaymentIsValid(int grossValue, string cardNumber)
     {
         // Arrange
-
         var payment = new PaymentViewModel
         {
             GrossValue = grossValue,
@@ -30,12 +23,31 @@ public class PaymentViewModelTest
         };
 
         // Act
-
-        var result = TransactionsManager.Validation(payment);
+        var errors = TestModelHelper.Validate(payment);
 
         // Assert
+        Assert.Equal(0, errors.Count);
+    }
 
-        //Assert.Null(()payment);
-        
+    [Theory]
+    [InlineData(0f, "0000000000000000")]
+    [InlineData(-100f, "0000000000000000")]
+    [InlineData(null, "0000000000000000")]
+    [InlineData(100, "00000 0000000000")]
+    public void PaymentIsNotValid(int grossValue, string cardNumber)
+    {
+        // Arrange
+        var payment = new PaymentViewModel
+        {
+            GrossValue = grossValue,
+            CardNumber = cardNumber
+        };
+
+        // Act
+        var errors = TestModelHelper.Validate(payment);
+
+        // Assert
+        Assert.NotNull(errors);
+        Assert.NotEmpty(errors);
     }
 }
