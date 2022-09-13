@@ -4,10 +4,12 @@ using System.Threading;
 using api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using PaymentAPI;
 using PaymentAPI.Controllers;
 using PaymentAPI.Data;
 using PaymentAPI.Models;
+using PaymentAPI.Validations;
 using Xunit;
 
 
@@ -32,9 +34,6 @@ public class PaymentControllerTest
     {
         // Arrange
 
-        var paymentAPIController = new PaymentController(_context);
-
-
         var payment = new Payment
         {
             GrossValue = 5000f,
@@ -65,11 +64,18 @@ public class PaymentControllerTest
             CardNumber = "1023654485698025"
         };
 
-        await _context.AddAsync(payment);
-        await _context.AddAsync(payment2);
-        await _context.AddAsync(payment3);
-        await _context.AddAsync(payment4);
-        await _context.AddAsync(payment5);
+        var paymentList = new List<Payment>();
+
+        paymentList.Add(payment);
+        paymentList.Add(payment2);
+        paymentList.Add(payment3);
+        paymentList.Add(payment4);
+        paymentList.Add(payment5);
+
+        var manager = new Mock<ITransactionsManager>();
+        manager.Setup(x => x.getAllAsync()).ReturnsAsync(paymentList);
+
+        var paymentAPIController = new PaymentController(manager.Object);
 
 
         //Act
@@ -82,56 +88,23 @@ public class PaymentControllerTest
 
     }
 
-    [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(3)]
-    [InlineData(4)]
-    [InlineData(5)]
-    public async Task ShouldListAnExistentId(int id)
+    [Fact]
+    public async Task ShouldListAnExistentId()
     {
         // Arrange
-
-        var paymentController = new PaymentController(_context);
-
+        var id = new Random().Next();
         var payment = new Payment
         {
             GrossValue = 5000f,
             CardNumber = "1023654785698745"
         };
 
-        var payment2 = new Payment
-        {
-            GrossValue = 5000f,
-            CardNumber = "1023654787498745"
-        };
+        var manager = new Mock<ITransactionsManager>();
+        manager.Setup(x => x.getByIdAsync(id)).ReturnsAsync(payment);
 
-        var payment3 = new Payment
-        {
-            GrossValue = 5000f,
-            CardNumber = "1023054785698025"
-        };
-
-        var payment4 = new Payment
-        {
-            GrossValue = 5000f,
-            CardNumber = "102365478569825"
-        };
-
-        var payment5 = new Payment
-        {
-            GrossValue = 5000f,
-            CardNumber = "1023654485698025"
-        };
-
-        await _context.AddAsync(payment);
-        await _context.AddAsync(payment2);
-        await _context.AddAsync(payment3);
-        await _context.AddAsync(payment4);
-        await _context.AddAsync(payment5);
+        var paymentController = new PaymentController(manager.Object);
 
         //Act
-
         var result = (OkObjectResult)await paymentController.GetById(id);
 
         // Assert
@@ -139,57 +112,18 @@ public class PaymentControllerTest
         Assert.Equal(200, result.StatusCode);
     }
 
-    [Theory]
-    [InlineData(500)]
-    [InlineData(50)]
-    [InlineData(90)]
-    [InlineData(6)]
-    [InlineData(30)]
-    [InlineData(10)]
-    public async Task ShouldNotListANotExistentId(int id)
+    [Fact]
+    public async Task ShouldNotListANotExistentId()
     {
         // Arrange
+        var id = new Random().Next();
 
-        var paymentController = new PaymentController(_context);
+        var manager = new Mock<ITransactionsManager>();
+        manager.Setup(x => x.getByIdAsync(id)).ReturnsAsync((Payment)null);
 
-        var payment = new Payment
-        {
-            GrossValue = 5000f,
-            CardNumber = "1023654785698745"
-        };
-
-        var payment2 = new Payment
-        {
-            GrossValue = 5000f,
-            CardNumber = "1023654787498745"
-        };
-
-        var payment3 = new Payment
-        {
-            GrossValue = 5000f,
-            CardNumber = "1023054785698025"
-        };
-
-        var payment4 = new Payment
-        {
-            GrossValue = 5000f,
-            CardNumber = "102365478569825"
-        };
-
-        var payment5 = new Payment
-        {
-            GrossValue = 5000f,
-            CardNumber = "1023654485698025"
-        };
-
-        await _context.AddAsync(payment);
-        await _context.AddAsync(payment2);
-        await _context.AddAsync(payment3);
-        await _context.AddAsync(payment4);
-        await _context.AddAsync(payment5);
+        var paymentController = new PaymentController(manager.Object);
 
         //Act
-
         var result = (NotFoundResult)await paymentController.GetById(id);
 
         // Assert
@@ -203,7 +137,7 @@ public class PaymentControllerTest
     public async Task TransactionShouldBeApproved(int grossValue, string cardNumber)
     {
         // Arrange
-        var paymentController = new PaymentController(_context);
+        var paymentController = new PaymentController(new TransactionsManager(_context));
 
         var viewModel = new PaymentViewModel
         {
@@ -236,7 +170,7 @@ public class PaymentControllerTest
     {
         // Arrange
 
-        var paymentController = new PaymentController(_context);
+        var paymentController = new PaymentController(new TransactionsManager(_context));
 
         var viewModel = new PaymentViewModel
         {

@@ -10,7 +10,14 @@ using api.Models;
 
 namespace PaymentAPI.Validations;
 
-public class TransactionsManager
+public interface ITransactionsManager
+{
+    Task<(Payment payment, bool sucess)> CreatAsync(PaymentViewModel viewModel);
+    Task<List<Payment>> getAllAsync();
+    Task<Payment?> getByIdAsync(int id);
+}
+
+public class TransactionsManager : ITransactionsManager
 {
     private readonly PaymentDbContext _context;
     public TransactionsManager(PaymentDbContext context) => _context = context;
