@@ -14,9 +14,6 @@ namespace PaymentAPI.Controllers;
 [ApiController]
 public class PaymentController : ControllerBase
 {
-
-    //private readonly PaymentDbContext _context;
-
     private readonly TransactionsManager _manager;
 
     public PaymentController(TransactionsManager manager)
