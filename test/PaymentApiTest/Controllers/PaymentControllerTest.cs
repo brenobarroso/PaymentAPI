@@ -155,6 +155,8 @@ public class PaymentControllerTest
         // Act
 
         var result = (OkObjectResult)await paymentController.Transaction(viewModel);
+
+        // Assert
         var resultContent = (Payment)result.Value;
 
         Assert.Equal(200, result.StatusCode);
@@ -174,34 +176,46 @@ public class PaymentControllerTest
     {
         // Arrange
 
-        var paymentController = new PaymentController(new TransactionsManager(_context));
+        var viewModel = new PaymentViewModel();
 
-        var viewModel = new PaymentViewModel
+        var manager = new Mock<ITransactionsManager>();
+
+        var mockedTransation = new Payment
         {
-            GrossValue = grossValue,
-            CardNumber = cardNumber
+            TransationDate = DateTime.UtcNow,
+            ApprovalDate = null,
+            DisapprovalDate = DateTime.UtcNow,
+            Confirmation = false,
+            GrossValue = new Random().NextSingle(),
+            NetValue = new Random().NextSingle(),
+            FlatRate = new Random().NextSingle(),
+            CardNumber = new Random().Next(0, 9999).ToString().PadLeft(4, '0'),
         };
+
+        mockedTransation.NetValue = mockedTransation.GrossValue - mockedTransation.FlatRate;
+
+        manager.Setup(x => x.CreatAsync(viewModel)).ReturnsAsync((mockedTransation, true));
+
+        var paymentController = new PaymentController(manager.Object);
 
         // Act
 
-        var result = (OkResult)await paymentController.Transaction(viewModel);
-
-        var payments = await _context.Payments.ToListAsync();
+        var result = (OkObjectResult)await paymentController.Transaction(viewModel);
+        var resultContent = (Payment)result.Value;
 
 
         // Assert
 
         Assert.Equal(200, result.StatusCode);
-        Assert.Single(payments);
-        Assert.Equal(viewModel.GrossValue, payments.First().GrossValue);
-        Assert.Null(payments.First().NetValue);
-        Assert.Equal(DateTime.UtcNow.Date, payments.First().TransationDate.Date);
-        Assert.Equal(DateTime.UtcNow.Date, payments.First().DisapprovalDate.Value.Date);
-        Assert.Null(payments.First().ApprovalDate);
-        Assert.NotNull(payments.First().DisapprovalDate);
-        Assert.Equal(false, payments.First().Confirmation);
-        Assert.NotNull(payments.First().FlatRate);
-        Assert.Equal(4, payments.First().CardNumber.Length);
+        Assert.Equal(mockedTransation.TransationDate, resultContent.TransationDate);
+        Assert.Equal(mockedTransation.ApprovalDate, resultContent.ApprovalDate);
+        Assert.Equal(mockedTransation.DisapprovalDate, resultContent.DisapprovalDate);
+        Assert.Equal(mockedTransation.Confirmation, resultContent.Confirmation);
+        Assert.Equal(mockedTransation.GrossValue, resultContent.GrossValue);
+        Assert.Equal(mockedTransation.NetValue, resultContent.NetValue);
+        Assert.Equal(mockedTransation.FlatRate, resultContent.FlatRate);
+        Assert.Equal(mockedTransation.CardNumber, resultContent.CardNumber);
+
 
     }
 }
