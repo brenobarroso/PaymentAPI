@@ -1,16 +1,11 @@
-using System;
-using System.Linq;
-using System.Threading;
 using api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using PaymentAPI;
 using PaymentAPI.Controllers;
 using PaymentAPI.Data;
 using PaymentAPI.Models;
 using PaymentAPI.Validations;
-using Xunit;
 
 
 namespace PaymentApiTest.Controllers;
@@ -132,18 +127,23 @@ public class PaymentControllerTest
     }
 
     [Theory]
-    [InlineData(5000f, "5630125478536540")]
+    // [InlineData(5000f, "5630125478536540")]
     [InlineData(5000f, "0000599978536540")]
     public async Task TransactionShouldBeApproved(int grossValue, string cardNumber)
     {
         // Arrange
-        var paymentController = new PaymentController(new TransactionsManager(_context));
-
-        var viewModel = new PaymentViewModel
+         var viewModel = new PaymentViewModel
         {
             GrossValue = grossValue,
             CardNumber = cardNumber
         };
+
+        var manager = new Mock<ITransactionsManager>();
+
+        var tupleToReturn = Tuple.Create<Payment, bool>;
+        manager.Setup(x => x.CreatAsync(viewModel)).ReturnsAsync(tupleToReturn);        
+        
+        var paymentController = new PaymentController(manager.Object);
 
         // Act
 
