@@ -93,33 +93,4 @@ public class TransactionsManagerTest
         Assert.Equal(false, result.payment.Confirmation);
     }
 
-    [Theory]
-    [InlineData(5000f, "599965478569874")]
-    [InlineData(5000f, "59996547856987450")]
-    [InlineData(5000f, "599965478569874a")]
-    [InlineData(5000f, "59996547856987!5")]
-    [InlineData(5000f, "599965478569874 ")]
-    [InlineData(0f, "5999654785698745")]
-    [InlineData(-5000f, "5999654785698745")]
-    public async Task ShouldReturnFalseSucessAsync(float grossValue, string cardNumber)
-    {
-        // Arrange
-
-        var payment = new PaymentViewModel
-        {
-            GrossValue = grossValue,
-            CardNumber = cardNumber
-        };
-
-        var manager = new TransactionsManager(_context);
-
-        // Act
-
-        var result = await manager.CreatAsync(payment);
-
-        // Assert
-
-        Assert.Equal(false, result.sucess);
-
-    }
 }
