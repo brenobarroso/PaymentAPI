@@ -194,28 +194,18 @@ public class PaymentControllerTest
 
         mockedTransation.NetValue = mockedTransation.GrossValue - mockedTransation.FlatRate;
 
-        manager.Setup(x => x.CreatAsync(viewModel)).ReturnsAsync((mockedTransation, true));
+        manager.Setup(x => x.CreatAsync(viewModel)).ReturnsAsync((mockedTransation, false));
 
         var paymentController = new PaymentController(manager.Object);
 
         // Act
 
-        var result = (OkObjectResult)await paymentController.Transaction(viewModel);
-        var resultContent = (Payment)result.Value;
-
+        var result = (UnprocessableEntityObjectResult)await paymentController.Transaction(viewModel);
 
         // Assert
 
-        Assert.Equal(200, result.StatusCode);
-        Assert.Equal(mockedTransation.TransationDate, resultContent.TransationDate);
-        Assert.Equal(mockedTransation.ApprovalDate, resultContent.ApprovalDate);
-        Assert.Equal(mockedTransation.DisapprovalDate, resultContent.DisapprovalDate);
-        Assert.Equal(mockedTransation.Confirmation, resultContent.Confirmation);
-        Assert.Equal(mockedTransation.GrossValue, resultContent.GrossValue);
-        Assert.Equal(mockedTransation.NetValue, resultContent.NetValue);
-        Assert.Equal(mockedTransation.FlatRate, resultContent.FlatRate);
-        Assert.Equal(mockedTransation.CardNumber, resultContent.CardNumber);
-
+        Assert.Equal("payment reproved", (string)result.Value);
+        Assert.Equal(422, result.StatusCode);
 
     }
 }
