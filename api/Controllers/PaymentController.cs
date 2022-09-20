@@ -7,6 +7,7 @@ using PaymentAPI.Models;
 using PaymentAPI.Validations;
 using System;
 using api.Models;
+using api.Interfaces;
 
 namespace PaymentAPI.Controllers;
 

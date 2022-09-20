@@ -1,21 +1,10 @@
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Data;
 using PaymentAPI.Models;
-
-using System;
 using api.Models;
+using api.Interfaces;
 
 namespace PaymentAPI.Validations;
-
-public interface ITransactionsManager
-{
-    Task<(Payment payment, bool sucess)> CreatAsync(PaymentViewModel viewModel);
-    Task<List<Payment>> getAllAsync();
-    Task<Payment?> getByIdAsync(int id);
-}
 
 public class TransactionsManager : ITransactionsManager
 {

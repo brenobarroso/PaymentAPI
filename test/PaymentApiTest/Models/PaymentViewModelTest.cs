@@ -1,9 +1,4 @@
 using api.Models;
-using Microsoft.AspNetCore.Mvc;
-using PaymentAPI.Controllers;
-using api.Models;
-using PaymentAPI.Validations;
-using PaymentAPI.Models;
 
 namespace PaymentApiTest.Models;
 

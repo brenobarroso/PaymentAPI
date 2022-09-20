@@ -1,3 +1,4 @@
+using api.Interfaces;
 using api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -5,7 +6,6 @@ using Moq;
 using PaymentAPI.Controllers;
 using PaymentAPI.Data;
 using PaymentAPI.Models;
-using PaymentAPI.Validations;
 
 
 namespace PaymentApiTest.Controllers;
