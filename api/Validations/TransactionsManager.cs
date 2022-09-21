@@ -62,6 +62,17 @@ public class TransactionsManager : ITransactionsManager
         };
         approvedTransation.NetValue = approvedTransation.GrossValue - approvedTransation.FlatRate;
 
+        var newInstallment = new Installment
+        {
+            ReceiptDate = DateTime.UtcNow.AddDays(30),
+            InstallmentNumber = 1,
+            InstallmentGrossValue = viewModel.GrossValue / 1f,
+            InstallmentNetValue = (float)(viewModel.GrossValue - approvedTransation.FlatRate),
+            Payment = approvedTransation
+        };
+
+        approvedTransation.Installments = (ICollection<Installment>)newInstallment;
+
         await _context.Payments.AddAsync(approvedTransation);
         await _context.SaveChangesAsync();
 

@@ -1,3 +1,4 @@
+using api.Models;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Models;
 
@@ -12,4 +13,5 @@ public class PaymentDbContext : DbContext
     }
 
     public DbSet<Payment> Payments { get; set; }
+    public DbSet<Installment> Installments { get; set; }
 }
