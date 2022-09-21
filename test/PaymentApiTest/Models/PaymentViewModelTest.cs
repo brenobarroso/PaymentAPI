@@ -1,9 +1,8 @@
 using api.Models;
-using PaymentAPI.Models;
 
 namespace PaymentApiTest.Models;
 
-public class PaymentTests
+public class PaymentViewModelTest
 {
     [Theory]
     [InlineData(1f, "0000000000000000")]
@@ -29,7 +28,7 @@ public class PaymentTests
     [InlineData(0f, "0000000000000000")]
     [InlineData(-100f, "0000000000000000")]
     [InlineData(null, "0000000000000000")]
-    [InlineData(100f, "00000 0000000000")]
+    [InlineData(100, "00000 0000000000")]
     public void PaymentIsNotValid(int grossValue, string cardNumber)
     {
         // Arrange
@@ -44,5 +43,6 @@ public class PaymentTests
 
         // Assert
         Assert.NotNull(errors);
+        Assert.NotEmpty(errors);
     }
 }

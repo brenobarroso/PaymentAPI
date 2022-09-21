@@ -1,5 +1,7 @@
+using api.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Data;
+using PaymentAPI.Validations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,7 @@ builder.Services.AddSwaggerGen();
 var serverDbOptions = new DbContextOptionsBuilder<PaymentDbContext>();
             serverDbOptions.UseNpgsql(builder.Configuration.GetSection("ServerDbSettings")["ConnectionString"]);
 builder.Services.AddSingleton<PaymentDbContext>(new PaymentDbContext(serverDbOptions.Options));
+builder.Services.AddTransient<ITransactionsManager, TransactionsManager>();
 var app = builder.Build();
 
 
