@@ -13,7 +13,7 @@ public class TransactionsManager : ITransactionsManager
 
     public async Task<List<Payment>> getAllAsync()
     {
-        var result = await _context.Payments.ToListAsync();
+        var result = await _context.Payments.Include(x => x.Installments).ToListAsync();
         return result;
     }
 
@@ -68,10 +68,13 @@ public class TransactionsManager : ITransactionsManager
             InstallmentNumber = 1,
             InstallmentGrossValue = viewModel.GrossValue / 1f,
             InstallmentNetValue = (float)(viewModel.GrossValue - approvedTransation.FlatRate),
-            Payment = approvedTransation
         };
 
-        approvedTransation.Installments = (ICollection<Installment>)newInstallment;
+        var listOfInstallments = new List<Installment>();
+        listOfInstallments.Add(newInstallment);
+
+        approvedTransation.Installments = listOfInstallments;
+        newInstallment.Payment = approvedTransation;
 
         await _context.Payments.AddAsync(approvedTransation);
         await _context.SaveChangesAsync();
