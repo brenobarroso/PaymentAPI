@@ -67,8 +67,9 @@ public class TransactionsManager : ITransactionsManager
             ReceiptDate = DateTime.UtcNow.AddDays(30),
             InstallmentNumber = 1,
             InstallmentGrossValue = viewModel.GrossValue / 1f,
-            InstallmentNetValue = (float)(viewModel.GrossValue - approvedTransation.FlatRate),
         };
+
+        newInstallment.InstallmentNetValue = (float)(newInstallment.InstallmentGrossValue - approvedTransation.FlatRate);
 
         var listOfInstallments = new List<Installment>();
         listOfInstallments.Add(newInstallment);
