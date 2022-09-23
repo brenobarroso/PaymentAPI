@@ -61,11 +61,39 @@ public class PaymentController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var payment = await _manager.getByIdAsync(id);
-
+        var result = new List<PaymentResult>();
+            
         if (payment == null)
             return NotFound();
         else
-            return Ok(payment);
+        {
+            var paymentResult = new PaymentResult{
+            Id = payment.Id,
+            TransationDate = payment.TransationDate,
+            ApprovalDate = payment.ApprovalDate,
+            DisapprovalDate = payment.DisapprovalDate,
+            Confirmation = payment.Confirmation,
+            GrossValue = payment.GrossValue,
+            NetValue = payment.NetValue,
+            FlatRate = payment.FlatRate,
+            CardNumber = payment.CardNumber,
+            Installments = new List<InstallmentResult>()
+            };
+
+            foreach (var installment in payment.Installments)
+            {
+                var installmentResult = new InstallmentResult{
+                    Id = installment.Id,
+                    InstallmentGrossValue = installment.InstallmentGrossValue,
+                    InstallmentNetValue = installment.InstallmentNetValue,
+                    InstallmentNumber = installment.InstallmentNumber,
+                    ReceiptDate = installment.ReceiptDate
+                };
+                paymentResult.Installments.Add(installmentResult);
+            }
+                result.Add(paymentResult);
+            }
+            return Ok(result);
     }
 
     [HttpPost]
@@ -75,7 +103,10 @@ public class PaymentController : ControllerBase
         var result = await _manager.CreatAsync(viewModel);
 
         if (result.sucess)
-            return Ok(result.payment);
+        {
+            Ok(result.payment);
+        }
+            
 
         return UnprocessableEntity("payment reproved");
     }
