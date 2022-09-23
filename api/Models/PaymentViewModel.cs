@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using api.Models;
 using api.Validations;
-using PaymentAPI.Models;
 
 namespace api.Models;
 

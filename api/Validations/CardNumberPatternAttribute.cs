@@ -6,7 +6,6 @@ namespace api.Validations
     {
         public CardNumberPatternAttribute()
         {
-            
         }
 
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)

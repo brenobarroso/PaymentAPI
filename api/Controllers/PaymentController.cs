@@ -49,10 +49,7 @@ public class PaymentController : ControllerBase
                 };
                 paymentResult.Installments.Add(installmentResult);
             }
-
             result.Add(paymentResult);
-
-
         }
 
         return Ok(result);

@@ -26,5 +26,4 @@ public class Payment
     public string CardNumber { get; set; } = " ";// 4 ultimos digitos do cartão
 
     public ICollection<Installment> Installments { get; set; } // Lista das parcelas
-
 }
