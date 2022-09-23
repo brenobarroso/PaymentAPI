@@ -62,20 +62,24 @@ public class TransactionsManager : ITransactionsManager
         };
         approvedTransation.NetValue = approvedTransation.GrossValue - approvedTransation.FlatRate;
 
-        var newInstallment = new Installment
-        {
-            ReceiptDate = DateTime.UtcNow.AddDays(30),
-            InstallmentNumber = 1,
-            InstallmentGrossValue = viewModel.GrossValue / 1f,
-        };
-
-        newInstallment.InstallmentNetValue = (float)(newInstallment.InstallmentGrossValue - approvedTransation.FlatRate);
-
         var listOfInstallments = new List<Installment>();
-        listOfInstallments.Add(newInstallment);
+        
+        for(int i = 1; i <= viewModel.InstallmentQuantity; i++)
+        {
+            var newInstallment = new Installment
+            {
+                ReceiptDate = DateTime.UtcNow.AddDays(30 * i),
+                InstallmentNumber = i,
+                InstallmentGrossValue = viewModel.GrossValue / (float)viewModel.InstallmentQuantity,
+            };
 
-        approvedTransation.Installments = listOfInstallments;
-        newInstallment.Payment = approvedTransation;
+            newInstallment.InstallmentNetValue = (float)(newInstallment.InstallmentGrossValue - approvedTransation.FlatRate);
+            
+            listOfInstallments.Add(newInstallment);
+
+            approvedTransation.Installments = listOfInstallments;
+            newInstallment.Payment = approvedTransation;
+        }
 
         await _context.Payments.AddAsync(approvedTransation);
         await _context.SaveChangesAsync();
