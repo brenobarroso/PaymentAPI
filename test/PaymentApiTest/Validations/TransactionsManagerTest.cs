@@ -58,12 +58,18 @@ public class TransactionsManagerTest
         Assert.Null(result.payment.DisapprovalDate);
         Assert.Equal(true, result.payment.Confirmation);
 
-        Assert.NotNull(result.payment.Installments);
-        Assert.NotNull(result.payment.Installments.First().ReceiptDate);
         var auxInstallmentNetValue = (payment.GrossValue / (float)payment.InstallmentQuantity) - result.payment.FlatRate;
-        Assert.Equal(auxInstallmentNetValue , result.payment.Installments.First().InstallmentNetValue);
-        Assert.Equal((payment.GrossValue / (float)payment.InstallmentQuantity), result.payment.Installments.First().InstallmentGrossValue);
-        Assert.Equal(1, result.payment.Installments.First().InstallmentNumber);
+
+        Assert.All(result.payment.Installments, 
+                    p => Assert.NotNull(p.Id));
+        Assert.All(result.payment.Installments, 
+                    p => Assert.NotNull(p.ReceiptDate));
+        Assert.All(result.payment.Installments, 
+                    p => Assert.Equal(auxInstallmentNetValue, p.InstallmentNetValue));
+        Assert.All(result.payment.Installments, 
+                    p => Assert.Equal((payment.GrossValue / (float)payment.InstallmentQuantity), p.InstallmentGrossValue));
+        Assert.All(result.payment.Installments, 
+                    p => Assert.NotNull(p.InstallmentNumber));
     }
 
     [Theory]

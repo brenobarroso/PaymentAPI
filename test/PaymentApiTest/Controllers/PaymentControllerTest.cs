@@ -194,7 +194,6 @@ public class PaymentControllerTest
         Assert.Equal(mockedTransation.NetValue, resultContent.NetValue);
         Assert.Equal(mockedTransation.FlatRate, resultContent.FlatRate);
         Assert.Equal(mockedTransation.CardNumber, resultContent.CardNumber);
-        // Assert.NotEmpty(mockedTransation.Installments);
     }
 
     [Theory]
