@@ -20,22 +20,23 @@ public class TransactionsManagerTest
     }
 
     [Theory]
-    [InlineData(5000f, "1023654785698745")]
-    [InlineData(5000f, "1023654787498745")]
-    [InlineData(5000f, "1023054785698025")]
-    [InlineData(5000f, "1023654485698025")]
-    [InlineData(5000f, "1023654785098745")]
-    [InlineData(5000f, "1023654787498745")]
-    [InlineData(5000f, "1023054785697725")]
-    [InlineData(5000f, "1027754485698025")]
-    public async Task ShouldConvertToApproved(float grossValue, string cardNumber)
+    [InlineData(5000f, "1023654785698745", 1)]
+    [InlineData(5000f, "1023654787498745", 2)]
+    [InlineData(5000f, "1023054785698025", 3)]
+    [InlineData(5000f, "1023654485698025", 4)]
+    [InlineData(5000f, "1023654785098745", 5)]
+    [InlineData(5000f, "1023654787498745", 6)]
+    [InlineData(5000f, "1023054785697725", 7)]
+    [InlineData(5000f, "1027754485698025", 8)]
+    public async Task ShouldConvertToApproved(float grossValue, string cardNumber, int installmentQuantity)
     {
         // Arrange
 
         var payment = new PaymentViewModel
         {
             GrossValue = grossValue,
-            CardNumber = cardNumber
+            CardNumber = cardNumber,
+            InstallmentQuantity = installmentQuantity
         };
 
         var manager = new TransactionsManager(_context);
@@ -57,6 +58,12 @@ public class TransactionsManagerTest
         Assert.Null(result.payment.DisapprovalDate);
         Assert.Equal(true, result.payment.Confirmation);
 
+        Assert.NotNull(result.payment.Installments);
+        Assert.NotNull(result.payment.Installments.First().ReceiptDate);
+        var auxInstallmentNetValue = (payment.GrossValue / (float)payment.InstallmentQuantity) - result.payment.FlatRate;
+        Assert.Equal(auxInstallmentNetValue , result.payment.Installments.First().InstallmentNetValue);
+        Assert.Equal((payment.GrossValue / (float)payment.InstallmentQuantity), result.payment.Installments.First().InstallmentGrossValue);
+        Assert.Equal(1, result.payment.Installments.First().InstallmentNumber);
     }
 
     [Theory]
