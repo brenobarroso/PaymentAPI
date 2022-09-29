@@ -20,22 +20,23 @@ public class TransactionsManagerTest
     }
 
     [Theory]
-    [InlineData(5000f, "1023654785698745")]
-    [InlineData(5000f, "1023654787498745")]
-    [InlineData(5000f, "1023054785698025")]
-    [InlineData(5000f, "1023654485698025")]
-    [InlineData(5000f, "1023654785098745")]
-    [InlineData(5000f, "1023654787498745")]
-    [InlineData(5000f, "1023054785697725")]
-    [InlineData(5000f, "1027754485698025")]
-    public async Task ShouldConvertToApproved(float grossValue, string cardNumber)
+    [InlineData(5000f, "1023654785698745", 1)]
+    [InlineData(5000f, "1023654787498745", 2)]
+    [InlineData(5000f, "1023054785698025", 3)]
+    [InlineData(5000f, "1023654485698025", 4)]
+    [InlineData(5000f, "1023654785098745", 5)]
+    [InlineData(5000f, "1023654787498745", 6)]
+    [InlineData(5000f, "1023054785697725", 7)]
+    [InlineData(5000f, "1027754485698025", 8)]
+    public async Task ShouldConvertToApproved(float grossValue, string cardNumber, int installmentQuantity)
     {
         // Arrange
 
         var payment = new PaymentViewModel
         {
             GrossValue = grossValue,
-            CardNumber = cardNumber
+            CardNumber = cardNumber,
+            InstallmentQuantity = installmentQuantity
         };
 
         var manager = new TransactionsManager(_context);
@@ -57,6 +58,22 @@ public class TransactionsManagerTest
         Assert.Null(result.payment.DisapprovalDate);
         Assert.Equal(true, result.payment.Confirmation);
 
+        var auxInstallmentNetValue = (result.payment.NetValue / (float)payment.InstallmentQuantity) - result.payment.FlatRate;
+
+        Assert.All(result.payment.Installments, 
+                    p => Assert.NotNull(p.Id));
+        Assert.All(result.payment.Installments, 
+                    p => Assert.NotNull(p.ReceiptDate));
+        Assert.All(result.payment.Installments,
+                p => Assert.Equal(DateTime.UtcNow.AddDays(30 * p.InstallmentNumber).Date,  p.ReceiptDate.Date)
+            );
+        Assert.All(result.payment.Installments, 
+                    p => Assert.Equal(auxInstallmentNetValue, p.InstallmentNetValue));
+        Assert.All(result.payment.Installments, 
+                    p => Assert.Equal((payment.GrossValue / (float)payment.InstallmentQuantity)
+                        , p.InstallmentGrossValue));
+        Assert.All(result.payment.Installments, 
+                    p => Assert.NotNull(p.InstallmentNumber));
     }
 
     [Theory]

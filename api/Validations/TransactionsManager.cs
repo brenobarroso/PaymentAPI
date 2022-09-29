@@ -13,7 +13,7 @@ public class TransactionsManager : ITransactionsManager
 
     public async Task<List<Payment>> getAllAsync()
     {
-        var result = await _context.Payments.ToListAsync();
+        var result = await _context.Payments.Include(x => x.Installments).ToListAsync();
         return result;
     }
 
@@ -61,6 +61,25 @@ public class TransactionsManager : ITransactionsManager
             CardNumber = fourLastDigitsOfCardApproved
         };
         approvedTransation.NetValue = approvedTransation.GrossValue - approvedTransation.FlatRate;
+
+        var listOfInstallments = new List<Installment>();
+        
+        for(int i = 1; i <= viewModel.InstallmentQuantity; i++)
+        {
+            var newInstallment = new Installment
+            {
+                ReceiptDate = DateTime.UtcNow.AddDays(30 * i),
+                InstallmentNumber = i,
+                InstallmentGrossValue = (float)(viewModel.GrossValue / (float)viewModel.InstallmentQuantity),
+            };
+
+            newInstallment.InstallmentNetValue = (float)(((approvedTransation.NetValue ) / viewModel.InstallmentQuantity) - approvedTransation.FlatRate);
+            
+            listOfInstallments.Add(newInstallment);
+
+            approvedTransation.Installments = listOfInstallments;
+            newInstallment.Payment = approvedTransation;
+        }
 
         await _context.Payments.AddAsync(approvedTransation);
         await _context.SaveChangesAsync();

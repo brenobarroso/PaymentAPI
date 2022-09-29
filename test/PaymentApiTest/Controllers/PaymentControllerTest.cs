@@ -144,7 +144,33 @@ public class PaymentControllerTest
             NetValue = new Random().NextSingle(),
             FlatRate = new Random().NextSingle(),
             CardNumber = new Random().Next(0, 9999).ToString().PadLeft(4, '0'),
+            Installments = new List<Installment>()
         };
+
+        var paymentResult = new PaymentResult{
+                Id = mockedTransation.Id,
+                TransationDate = mockedTransation.TransationDate,
+                ApprovalDate = mockedTransation.ApprovalDate,
+                DisapprovalDate = mockedTransation.DisapprovalDate,
+                Confirmation = mockedTransation.Confirmation,
+                GrossValue = mockedTransation.GrossValue,
+                NetValue = mockedTransation.NetValue,
+                FlatRate = mockedTransation.FlatRate,
+                CardNumber = mockedTransation.CardNumber,
+                Installments = new List<InstallmentResult>()
+            };
+
+            foreach (var installment in mockedTransation.Installments)
+            {
+                var installmentResult = new InstallmentResult{
+                    Id = installment.Id,
+                    InstallmentGrossValue = installment.InstallmentGrossValue,
+                    InstallmentNetValue = installment.InstallmentNetValue,
+                    InstallmentNumber = installment.InstallmentNumber,
+                    ReceiptDate = installment.ReceiptDate
+                };
+                paymentResult.Installments.Add(installmentResult);
+            }
 
         mockedTransation.NetValue = mockedTransation.GrossValue - mockedTransation.FlatRate;
 
@@ -157,7 +183,7 @@ public class PaymentControllerTest
         var result = (OkObjectResult)await paymentController.Transaction(viewModel);
 
         // Assert
-        var resultContent = (Payment)result.Value;
+        var resultContent = (PaymentResult)result.Value;
 
         Assert.Equal(200, result.StatusCode);
         Assert.Equal(mockedTransation.TransationDate, resultContent.TransationDate);

@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using api.Models;
 using api.Validations;
 using PaymentAPI.Controllers;
 
@@ -24,4 +25,5 @@ public class Payment
     [Required]
     public string CardNumber { get; set; } = " ";// 4 ultimos digitos do cartão
 
+    public ICollection<Installment> Installments { get; set; } // Lista das parcelas
 }
