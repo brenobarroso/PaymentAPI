@@ -73,7 +73,7 @@ public class TransactionsManager : ITransactionsManager
                 InstallmentGrossValue = (float)(viewModel.GrossValue / (float)viewModel.InstallmentQuantity),
             };
 
-            newInstallment.InstallmentNetValue = (float)(newInstallment.InstallmentGrossValue - approvedTransation.FlatRate);
+            newInstallment.InstallmentNetValue = (float)(((approvedTransation.NetValue ) / viewModel.InstallmentQuantity) - approvedTransation.FlatRate);
             
             listOfInstallments.Add(newInstallment);
 

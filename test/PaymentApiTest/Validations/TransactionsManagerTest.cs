@@ -58,7 +58,7 @@ public class TransactionsManagerTest
         Assert.Null(result.payment.DisapprovalDate);
         Assert.Equal(true, result.payment.Confirmation);
 
-        var auxInstallmentNetValue = (payment.GrossValue / (float)payment.InstallmentQuantity) - result.payment.FlatRate;
+        var auxInstallmentNetValue = (result.payment.NetValue / (float)payment.InstallmentQuantity) - result.payment.FlatRate;
 
         Assert.All(result.payment.Installments, 
                     p => Assert.NotNull(p.Id));
