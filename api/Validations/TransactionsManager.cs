@@ -86,4 +86,5 @@ public class TransactionsManager : ITransactionsManager
 
         return (approvedTransation, true);
     }
+
 }
