@@ -18,23 +18,26 @@ public class AccountManager : IAccountManager
 
     public async Task<Account?> getByCPFAsync(string cpf)
     {
-        var result = await _context.Accounts.FindAsync(cpf);
+        var result = await _context.Accounts
+                        .Where(x => x.CPF == cpf)
+                        .Where(x => x.IsActive)
+                        .FirstOrDefaultAsync();
 
-        if(result.Status.ToString() == "Inactive")
-            return null;
         if (result == null)
             return null;
-
+        if(result.IsActive == false)
+            return null;
+    
         return result;
     }
 
-    public async Task<Account?> getByAccountNumberAsync(string idAccount)
+    public async Task<Account?> getByAccountNumberAsync(int idAccount)
     {
         var result = await _context.Accounts.FindAsync(idAccount);
 
-        if(result.Status.ToString() == "Inactive")
-            return null;
         if (result == null)
+            return null;
+        if(result.IsActive == false)
             return null;
 
         return result;
@@ -42,18 +45,22 @@ public class AccountManager : IAccountManager
 
     public async Task<Account> CreateAccount(Account person)
     {
-        var newAccount = new Account{
-            CPF = person.CPF,
-            Agency = person.Agency,
-            HolderName = person.HolderName,
-            Balance = person.Balance
-        };
 
-        await _context.Accounts.AddAsync(newAccount);
+        await _context.Accounts.AddAsync(person);
         await _context.SaveChangesAsync();
 
-        return newAccount;
+        return person;
     }
 
-    // TODO: fazer função de delete e atualizar a interface.
+    public async Task<Account?> DeleteAccount(int idAccount)
+    {
+        var result = await _context.Accounts.FindAsync(idAccount);
+        if (result == null)
+            return null;
+
+        result.IsActive = false;
+        await _context.SaveChangesAsync();
+
+        return result;
+    }
 }
