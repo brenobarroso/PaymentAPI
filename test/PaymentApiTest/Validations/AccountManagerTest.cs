@@ -65,6 +65,58 @@ public class AccountManagerTest
     }
 
     [Fact]
+    public async Task ShouldNotBeCreated()
+    {
+        // Arrange
+        var manager = new AccountManager(_context);
+
+        var newAccount1 = new Account{
+            CPF = "12345678901",
+            Balance = 5000f,
+            HolderName = "Breno Santos Barroso",
+            Agency = "00239-9",
+            IsActive = true
+        };
+
+        var newAccount2 = new Account{
+            CPF = "12375678901",
+            Balance = 5000f,
+            HolderName = "Breno Santos",
+            Agency = "00239-9",
+            IsActive = true
+        };
+
+        var newAccount3 = new Account{
+            CPF = "12315678901",
+            Balance = 5000f,
+            HolderName = "Breno Barroso",
+            Agency = "00239-9",
+            IsActive = true
+        };
+
+        _context.Accounts.Add(newAccount1);
+        _context.Accounts.Add(newAccount2);
+        _context.Accounts.Add(newAccount3);
+        
+        await _context.SaveChangesAsync();
+
+        var invalidAccount = new Account{
+            CPF = "12315678901",
+            Balance = 5000f,
+            HolderName = "Breno Barroso",
+            Agency = "00239-9",
+            IsActive = true
+        };
+
+        // Act
+        var result = await manager.CreateAccount(invalidAccount);
+
+        // Assert
+        Assert.Null(result);
+
+    }
+
+    [Fact]
     public async Task ShouldListAll()
     {
         // Arrange
