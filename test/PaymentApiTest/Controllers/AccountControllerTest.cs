@@ -69,5 +69,28 @@ public class AccountControllerTest
         Assert.Equal(200, result.StatusCode);
     }
 
-    // [Fact]
+    [Fact]
+    public async Task ShouldListAnExistingAccountByAccountNumber()
+    {
+        // Arrange
+        var id = new Random().Next();
+        var newAccount1 = new Account{
+            CPF = "12345678901",
+            Balance = 5000f,
+            HolderName = "Breno Santos Barroso",
+            Agency = "00239-9",
+            IsActive = true
+        };
+
+        var manager = new Mock<IAccountManager>();
+        manager.Setup(x => x.getByAccountNumberAsync(id)).ReturnsAsync(newAccount1);
+
+        var accountController = new AccountController(manager.Object);
+
+        // Act
+        var result = (OkObjectResult)await accountController.GetByIdAccount(id);
+
+        // Assert
+        Assert.Equal(200, result.StatusCode);
+    }
 }
