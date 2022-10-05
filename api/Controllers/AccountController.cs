@@ -53,7 +53,6 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> Register(Account person)
     {
         var newAccount = new Account{
-            Id = person.Id,
             CPF = person.CPF,
             Agency = person.Agency,
             HolderName = person.HolderName,
@@ -61,15 +60,10 @@ public class AccountController : ControllerBase
             IsActive = person.IsActive
         };
 
-        try
-        {
-            await _manager.CreateAccount(newAccount);
-            return Ok(newAccount);
-        }
-        catch (Exception)
-        {   
-            return UnprocessableEntity("erro de processamento");
-        }
+            var result = await _manager.CreateAccount(newAccount);
+            if(result == null)
+                UnprocessableEntity("error");
+            return Ok(result);
     }
 
     [HttpDelete("{id}")]

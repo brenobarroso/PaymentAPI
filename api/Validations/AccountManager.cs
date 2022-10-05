@@ -45,6 +45,9 @@ public class AccountManager : IAccountManager
 
     public async Task<Account> CreateAccount(Account person)
     {
+        var query = await getByCPFAsync(person.CPF);
+        if(query != null)
+            return null;
 
         await _context.Accounts.AddAsync(person);
         await _context.SaveChangesAsync();
