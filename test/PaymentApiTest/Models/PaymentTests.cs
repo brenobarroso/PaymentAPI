@@ -1,5 +1,4 @@
 using api.Models;
-using PaymentAPI.Models;
 
 namespace PaymentApiTest.Models;
 
