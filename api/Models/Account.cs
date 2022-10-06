@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using api.Validations;
+using PaymentAPI.Models;
 
 namespace api.Models;
 
@@ -25,4 +26,6 @@ public class Account
 
     [Required]
     public bool IsActive { get; set; }
+
+    public ICollection<Payment> Payments { get; set; } // transações de uma conta.
 }

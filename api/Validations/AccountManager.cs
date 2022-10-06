@@ -12,7 +12,7 @@ public class AccountManager : IAccountManager
 
     public async Task<List<Account>> getAllAccountsAsync()
     {
-        var result = await _context.Accounts.ToListAsync();
+        var result = await _context.Accounts.Include(x => x.Payments).ToListAsync();
         return result;
     }
 

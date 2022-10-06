@@ -1,13 +1,12 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using api.Models;
-using api.Validations;
-using PaymentAPI.Controllers;
 
 namespace PaymentAPI.Models;
 
 public class Payment
 {
+    [Required]
+    public Account Account { get; set; }
     [Required]
     public int Id { get; set; } // Identificador NSU
     [Required]
