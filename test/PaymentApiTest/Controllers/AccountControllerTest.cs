@@ -164,7 +164,7 @@ public class AccountControllerTest
     public async Task ShouldBeResgistredAnAccount()
     {
         // Arrange
-        var newAccount1 = new Account
+        var newAccount1 = new AccountViewModel
         {
             CPF = "12345678901",
             Balance = 5000f,

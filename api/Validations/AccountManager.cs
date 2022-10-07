@@ -2,6 +2,7 @@ using api.Interfaces;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Data;
+using PaymentAPI.Models;
 
 namespace api.Validations;
 
@@ -43,16 +44,27 @@ public class AccountManager : IAccountManager
         return result;
     }
 
-    public async Task<Account> CreateAccount(Account person)
+    public async Task<Account?> CreateAccount(AccountViewModel viewModel)
     {
-        var query = await getByCPFAsync(person.CPF);
+        var query = await getByCPFAsync(viewModel.CPF);
         if(query != null)
             return null;
 
-        await _context.Accounts.AddAsync(person);
+        var newAccount = new Account
+        {
+            CPF = viewModel.CPF,
+            Agency = viewModel.Agency,
+            HolderName = viewModel.HolderName,
+            IsActive = true
+        };
+
+        var payments = new List<Payment>();
+        newAccount.Payments = payments;
+
+        await _context.Accounts.AddAsync(newAccount);
         await _context.SaveChangesAsync();
 
-        return person;
+        return newAccount;
     }
 
     public async Task<Account?> DeleteAccount(int idAccount)
