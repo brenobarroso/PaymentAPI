@@ -79,8 +79,11 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> GetByIdAccount(int accountNumber)
     {
         var account = await _manager.getByAccountNumberAsync(accountNumber);
-        var payments = new List<PaymentResult>();
 
+        if(account == null)
+            return NotFound();
+
+        var payments = new List<PaymentResult>();
         foreach (var payment in account.Payments)
         {
             var paymentResult = new PaymentResult
@@ -121,10 +124,6 @@ public class AccountController : ControllerBase
             IsActive = account.IsActive,
             Payments = payments
         };
-
-
-        if(account == null)
-            return NotFound();
         
         return Ok(accountResult);
     }
@@ -135,8 +134,11 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> GetByCPF(string cpf)
     {
         var account = await _manager.getByCPFAsync(cpf);
-        var payments = new List<PaymentResult>();
 
+        if(account == null)
+            return NotFound();
+        
+        var payments = new List<PaymentResult>();
         foreach (var payment in account.Payments)
         {
             var paymentResult = new PaymentResult
@@ -177,10 +179,6 @@ public class AccountController : ControllerBase
             IsActive = account.IsActive,
             Payments = payments
         };
-
-
-        if(account == null)
-            return NotFound();
         
         return Ok(accountResult);
     }
@@ -242,8 +240,11 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> MakeInactive(int id) // mudar account pra result
     {
         var account = await _manager.DeleteAccount(id);
-        var payments = new List<PaymentResult>();
 
+        if(account == null)
+            return BadRequest();
+
+        var payments = new List<PaymentResult>();
         foreach (var payment in account.Payments)
         {
             var paymentResult = new PaymentResult
@@ -284,9 +285,6 @@ public class AccountController : ControllerBase
             IsActive = account.IsActive,
             Payments = payments
         };
-
-        if(account == null)
-            return BadRequest();
         
         return Ok(accountResult);
     }
