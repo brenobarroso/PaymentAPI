@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Data;
 using PaymentAPI.Models;
 
-namespace api.Validations;
+namespace api.Managers;
 
 public class AccountManager : IAccountManager
 {
