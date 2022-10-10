@@ -13,13 +13,18 @@ public class AccountManager : IAccountManager
 
     public async Task<List<Account>> getAllAccountsAsync()
     {
-        var result = await _context.Accounts.Include(x => x.Payments).ToListAsync();
+        var result = await _context.Accounts
+                                    .Include(x => x.Payments)
+                                    .ThenInclude(x => x.Installments)
+                                    .ToListAsync();
         return result;
     }
 
     public async Task<Account?> getByCPFAsync(string cpf)
     {
         var result = await _context.Accounts
+                        .Include(x => x.Payments)
+                        .ThenInclude(x => x.Installments)
                         .Where(x => x.CPF == cpf)
                         .Where(x => x.IsActive)
                         .FirstOrDefaultAsync();
@@ -34,7 +39,9 @@ public class AccountManager : IAccountManager
 
     public async Task<Account?> getByAccountNumberAsync(int idAccount)
     {
-        var result = await _context.Accounts.FindAsync(idAccount);
+        var result = await _context.Accounts.Include(x => x.Payments)
+                                            .ThenInclude(x => x.Installments)
+                                            .Where(x => x.Id == idAccount).SingleAsync();
 
         if (result == null)
             return null;

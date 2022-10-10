@@ -19,12 +19,15 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> Get()
     {
         var accounts = await _manager.getAllAccountsAsync();
+
+        if(accounts == null)
+            return NotFound();
+
         var accountsResult = new List<AccountResult>();
 
         foreach (Account account in accounts)
         {
             var payments = new List<PaymentResult>();
-
             foreach (var payment in account.Payments)
             {
                 var paymentResult = new PaymentResult
