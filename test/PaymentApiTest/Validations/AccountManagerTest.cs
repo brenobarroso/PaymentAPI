@@ -1,7 +1,8 @@
+using api.Managers;
 using api.Models;
-using api.Validations;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Data;
+using PaymentAPI.Models;
 
 namespace PaymentApiTest.Validations;
 
@@ -29,7 +30,8 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         var manager = new AccountManager(_context);
@@ -47,12 +49,10 @@ public class AccountManagerTest
     public async Task ShouldBeCreated()
     {
         // Arrange
-        var newAccount = new Account{
+        var newAccount = new AccountViewModel{
             CPF = "12345678901",
-            Balance = 5000f,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
-            IsActive = true
         };
 
         var manager = new AccountManager(_context);
@@ -62,6 +62,12 @@ public class AccountManagerTest
 
         // Assert
         Assert.NotNull(newAccount);
+        Assert.Equal(newAccount.CPF, result.Result.CPF);
+        Assert.Equal(newAccount.Agency, result.Result.Agency);
+        Assert.Equal(newAccount.HolderName, result.Result.HolderName);
+        Assert.NotNull(result.Result.Id);
+        Assert.NotNull(result.Result.Payments);
+        Assert.Equal(true, result.Result.IsActive);
     }
 
     [Fact]
@@ -100,12 +106,10 @@ public class AccountManagerTest
         
         await _context.SaveChangesAsync();
 
-        var invalidAccount = new Account{
+        var invalidAccount = new AccountViewModel{
             CPF = "12315678901",
-            Balance = 5000f,
             HolderName = "Breno Barroso",
             Agency = "00239-9",
-            IsActive = true
         };
 
         // Act
@@ -127,7 +131,8 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         var newAccount2 = new Account{
@@ -135,7 +140,8 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Santos",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         var newAccount3 = new Account{
@@ -143,7 +149,8 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         _context.Accounts.Add(newAccount1);
@@ -171,7 +178,8 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         var newAccount2 = new Account{
@@ -179,7 +187,8 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Santos",
             Agency = "00239-9",
-            IsActive = false
+            IsActive = false,
+            Payments = new List<Payment>()
         };
 
         var newAccount3 = new Account{
@@ -187,7 +196,8 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         _context.Accounts.Add(newAccount1);
@@ -216,7 +226,8 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         var newAccount2 = new Account{
@@ -224,15 +235,17 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Santos",
             Agency = "00239-9",
-            IsActive = false
+            IsActive = false,
+            Payments = new List<Payment>()
         };
 
         var newAccount3 = new Account{
-            CPF = "12315678901",
+            CPF = "12315678900",
             Balance = 5000f,
             HolderName = "Breno Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         _context.Accounts.Add(newAccount1);
@@ -242,7 +255,7 @@ public class AccountManagerTest
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await manager.getByCPFAsync("12315678961");
+        var result = await manager.getByCPFAsync("12315678901");
 
         // Assert
         Assert.Null(result);
@@ -260,7 +273,8 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         var newAccount2 = new Account{
@@ -268,7 +282,8 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Santos",
             Agency = "00239-9",
-            IsActive = false
+            IsActive = false,
+            Payments = new List<Payment>()
         };
 
         var newAccount3 = new Account{
@@ -276,7 +291,8 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         _context.Accounts.Add(newAccount1);
@@ -305,7 +321,8 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         var newAccount2 = new Account{
@@ -313,7 +330,8 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Santos",
             Agency = "00239-9",
-            IsActive = false
+            IsActive = false,
+            Payments = new List<Payment>()
         };
 
         var newAccount3 = new Account{
@@ -321,7 +339,8 @@ public class AccountManagerTest
             Balance = 5000f,
             HolderName = "Breno Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         _context.Accounts.Add(newAccount1);
@@ -331,7 +350,7 @@ public class AccountManagerTest
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await manager.getByAccountNumberAsync(5000);
+        var result = await manager.getByAccountNumberAsync(newAccount2.Id);
 
         // Assert
         Assert.Null(result);

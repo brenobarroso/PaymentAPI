@@ -6,7 +6,7 @@ using api.Interfaces;
 using api.Validations;
 using api.Managers;
 
-namespace PaymentAPI.Validations;
+namespace api.Managers;
 
 public class TransactionsManager : ITransactionsManager
 {

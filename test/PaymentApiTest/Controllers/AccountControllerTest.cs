@@ -34,7 +34,8 @@ public class AccountControllerTest
             Balance = 5000f,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         var newAccount2 = new Account
@@ -43,7 +44,8 @@ public class AccountControllerTest
             Balance = 5000f,
             HolderName = "Breno Santos",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         var newAccount3 = new Account
@@ -52,7 +54,8 @@ public class AccountControllerTest
             Balance = 5000f,
             HolderName = "Breno Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         var accountList = new List<Account>();
@@ -84,7 +87,8 @@ public class AccountControllerTest
             Balance = 5000f,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         var manager = new Mock<IAccountManager>();
@@ -128,7 +132,8 @@ public class AccountControllerTest
             Balance = 5000f,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         var manager = new Mock<IAccountManager>();
@@ -164,21 +169,29 @@ public class AccountControllerTest
     public async Task ShouldBeResgistredAnAccount()
     {
         // Arrange
-        var newAccount1 = new AccountViewModel
+        var mockedAccount = new AccountViewModel
         {
             CPF = "12345678901",
-            Balance = 5000f,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
-            IsActive = true
         };
+
+        var newAccount = new Account
+        {
+            CPF = mockedAccount.CPF,
+            HolderName = mockedAccount.HolderName,
+            Agency = mockedAccount.Agency,
+            IsActive = true,
+            Payments = new List<Payment>()
+        };
+
         var manager = new Mock<IAccountManager>();
-        manager.Setup(x => x.CreateAccount(newAccount1)).ReturnsAsync(newAccount1);
+        manager.Setup(x => x.CreateAccount(mockedAccount)).ReturnsAsync(newAccount);
 
         var accountController = new AccountController(manager.Object);
 
         // Act
-        var result = (OkObjectResult)await accountController.Register(newAccount1);
+        var result = (OkObjectResult)await accountController.Register(mockedAccount);
 
         // Assert
 
@@ -196,7 +209,8 @@ public class AccountControllerTest
             Balance = 5000f,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>()
         };
 
         var manager = new Mock<IAccountManager>();

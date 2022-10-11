@@ -1,13 +1,17 @@
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Data;
-using PaymentAPI.Validations;
+using api.Managers;
+using api.Interfaces;
+using PaymentAPI.Models;
+using Moq;
 
 namespace PaymentApiTest.Validations;
 
 public class TransactionsManagerTest
 {
     protected readonly PaymentDbContext _context;
+    protected readonly IAccountManager _manager;
     public TransactionsManagerTest()
     {
         var options = new DbContextOptionsBuilder<PaymentDbContext>()
@@ -31,18 +35,32 @@ public class TransactionsManagerTest
     public async Task ShouldConvertToApproved(float grossValue, string cardNumber, int installmentQuantity)
     {
         // Arrange
+        var newAccount = new Account{
+            Id = 2,
+            CPF = "12345678901",
+            Balance = 5000f,
+            HolderName = "Breno Santos Barroso",
+            Agency = "00239-9",
+            IsActive = true,
+            Payments = new List<Payment>()
+        };
 
         var payment = new PaymentViewModel
         {
             GrossValue = grossValue,
             CardNumber = cardNumber,
-            InstallmentQuantity = installmentQuantity
+            InstallmentQuantity = installmentQuantity,
+            IdAccount = newAccount.Id
         };
+        var managerAccount = new AccountManager(_context);
+        
 
-        var manager = new TransactionsManager(_context);
+        Mock<IAccountManager> test = new Mock<IAccountManager>();
+        
+        test.Setup(x => x.getByAccountNumberAsync(newAccount.Id)).ReturnsAsync(newAccount);
+        var manager = new TransactionsManager(_context, test.Object);
 
         // Act
-
         var result = await manager.CreatAsync(payment);
 
         // Assert
@@ -57,6 +75,7 @@ public class TransactionsManagerTest
         Assert.NotNull(result.payment.ApprovalDate);
         Assert.Null(result.payment.DisapprovalDate);
         Assert.Equal(true, result.payment.Confirmation);
+        Assert.Equal(newAccount ,result.payment.Account);
 
         var auxInstallmentNetValue = (result.payment.NetValue / (float)payment.InstallmentQuantity) - result.payment.FlatRate;
 
@@ -77,20 +96,36 @@ public class TransactionsManagerTest
     }
 
     [Theory]
-    [InlineData(5000f, "5999654785698745")]
-    [InlineData(5000f, "5999654785698785")]
-    [InlineData(5000f, "5999654775698745")]
-    public async Task ShouldConvertToReprovedAsync(float grossValue, string cardNumber)
+    [InlineData(5000f, "5999654785698745", 1)]
+    [InlineData(5000f, "5999654785698785", 1)]
+    [InlineData(5000f, "5999654775698745", 1)]
+    public async Task ShouldConvertToReprovedAsync(float grossValue, string cardNumber, int installmentQuantity)
     {
         // Arrange
+        var newAccount = new Account{
+            Id = 2,
+            CPF = "12345678901",
+            Balance = 5000f,
+            HolderName = "Breno Santos Barroso",
+            Agency = "00239-9",
+            IsActive = true,
+            Payments = new List<Payment>()
+        };
 
         var payment = new PaymentViewModel
         {
             GrossValue = grossValue,
-            CardNumber = cardNumber
+            CardNumber = cardNumber,
+            InstallmentQuantity = installmentQuantity,
+            IdAccount = newAccount.Id
         };
 
-        var manager = new TransactionsManager(_context);
+        var managerAccount = new TransactionsManager(_context, _manager);
+
+        Mock<IAccountManager> test = new Mock<IAccountManager>();
+        
+        test.Setup(x => x.getByAccountNumberAsync(newAccount.Id)).ReturnsAsync(newAccount);
+        var manager = new TransactionsManager(_context, test.Object);
 
         // Act
 

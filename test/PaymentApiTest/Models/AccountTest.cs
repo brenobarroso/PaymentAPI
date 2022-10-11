@@ -1,25 +1,27 @@
 using api.Models;
+using PaymentAPI.Models;
 
 namespace PaymentApiTest.Models;
 
 public class AccountTest
 {
-    [Theory]
-    [InlineData(1, "12345678901", "0001", "Breno Barroso", 1000f, true)]
-    [InlineData(2, "12345678910", "0001", "Marcus Melo", 1000f, true)]
-    [InlineData(3, "12345678912", "0001", "Manoel Moreira", 1000f, true)]
-    public void AccountIsValid(int id, string cpf, string agency,
-                    string holderName, float balance, bool isActive)
+    [Fact]
+    public void AccountIsValid()
     {
         // Arrange
         var account = new Account
         {
-            Id = id,
-            CPF = cpf,
-            Agency = agency,
-            HolderName = holderName,
-            Balance = balance,
-            IsActive = isActive
+            Id = 1,
+            CPF = "12345678901",
+            Agency = "0001",
+            HolderName = "holderName",
+            Balance = 1f,
+            IsActive = true, 
+        };
+
+        var payment = new Payment
+        {
+
         };
 
         // Act
