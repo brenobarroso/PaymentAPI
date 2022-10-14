@@ -166,7 +166,7 @@ public class AccountControllerTest
     }
 
     [Fact]
-    public async Task ShouldBeResgistredAnAccount()
+    public async Task ShouldBeRegistredAnAccount()
     {
         // Arrange
         var mockedAccount = new AccountViewModel
@@ -196,6 +196,39 @@ public class AccountControllerTest
         // Assert
 
         Assert.Equal(200, result.StatusCode);
+    }
+
+    [Fact]
+    public async Task ShouldNotBeRegistredAnAccount()
+    {
+        // Arrange
+        var mockedAccount = new AccountViewModel
+        {
+            CPF = "12345678 01",
+            HolderName = "Breno Santos Barroso",
+            Agency = "00239-9",
+        };
+
+        var newAccount = new Account
+        {
+            CPF = mockedAccount.CPF,
+            HolderName = mockedAccount.HolderName,
+            Agency = mockedAccount.Agency,
+            IsActive = true,
+            Payments = new List<Payment>()
+        };
+
+        var manager = new Mock<IAccountManager>();
+        manager.Setup(x => x.CreateAccount(mockedAccount)).ReturnsAsync(newAccount);
+
+        var accountController = new AccountController(manager.Object);
+
+        // Act
+        var result = (UnprocessableEntityResult)await accountController.Register(mockedAccount);
+
+        // Assert
+
+        Assert.Equal(422, result.StatusCode);
     }
 
     [Fact]

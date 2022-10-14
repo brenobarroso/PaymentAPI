@@ -9,4 +9,5 @@ public interface IAccountManager
     Task<Account?> getByCPFAsync(string cpf);
     Task<List<Account>> getAllAccountsAsync();
     Task<Account?> DeleteAccount(int idAccount);
+    AccountResult ConvertToResult(Account account);
 }

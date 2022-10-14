@@ -10,10 +10,12 @@ public class CPFAttributePattern : ValidationAttribute
 
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
-            var cardLengthInvalid = ((string)value).Length != 11;
-            var cardDigitsInvalid = !((string)value).All(char.IsDigit);
+            if (value.GetType() != typeof(string)) return new ValidationResult("Erro de tipo!");
             
-            return cardDigitsInvalid == true || cardLengthInvalid == true
+            var cpfLengthInvalid = ((string)value).Length != 11;
+            var cpfDigitsInvalid = !((string)value).All(char.IsDigit);
+            
+            return cpfDigitsInvalid == true || cpfLengthInvalid == true
                     ? new ValidationResult("Atenção! Padrão inválido.")
                     : ValidationResult.Success;
         }

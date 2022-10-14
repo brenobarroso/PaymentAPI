@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using PaymentAPI.Models;
 using api.Models;
 using api.Interfaces;
 namespace PaymentAPI.Controllers;
@@ -14,6 +13,7 @@ public class AccountController : ControllerBase
     {
         _manager = manager;
     }
+    
 
     [HttpGet]
     public async Task<IActionResult> Get()
@@ -27,51 +27,8 @@ public class AccountController : ControllerBase
 
         foreach (Account account in accounts)
         {
-            var payments = new List<PaymentResult>();
-            foreach (var payment in account.Payments)
-            {
-                var paymentResult = new PaymentResult
-                {
-                    Id = payment.Id,
-                    TransationDate = payment.TransationDate,
-                    ApprovalDate = payment.ApprovalDate,
-                    DisapprovalDate = payment.DisapprovalDate,
-                    Confirmation = payment.Confirmation,
-                    GrossValue = payment.GrossValue,
-                    NetValue = payment.NetValue,
-                    FlatRate = payment.FlatRate,
-                    CardNumber = payment.CardNumber,
-                    Installments = new List<InstallmentResult>()
-                };
-
-                foreach (var installment in payment.Installments)
-                {
-                    var installmentResult = new InstallmentResult
-                    {
-                        Id = installment.Id,
-                        InstallmentGrossValue = installment.InstallmentGrossValue,
-                        InstallmentNetValue = installment.InstallmentNetValue,
-                        InstallmentNumber = installment.InstallmentNumber,
-                        ReceiptDate = installment.ReceiptDate
-                    };
-                    paymentResult.Installments.Add(installmentResult);
-                }
-                payments.Add(paymentResult);
-            }
-
-            var accountResult = new AccountResult
-            {
-                Id = account.Id,
-                CPF = account.CPF,
-                Agency = account.Agency,
-                HolderName = account.HolderName,
-                Balance = account.Balance,
-                IsActive = account.IsActive,
-                Payments = payments
-            };
-
-            accountsResult.Add(accountResult);
-
+            var result = _manager.ConvertToResult(account);
+            accountsResult.Add(result);
         }
         return Ok(accountsResult);
     }
@@ -86,49 +43,9 @@ public class AccountController : ControllerBase
         if(account == null)
             return NotFound();
 
-        var payments = new List<PaymentResult>();
-        foreach (var payment in account.Payments)
-        {
-            var paymentResult = new PaymentResult
-            {
-                Id = payment.Id,
-                TransationDate = payment.TransationDate,
-                ApprovalDate = payment.ApprovalDate,
-                DisapprovalDate = payment.DisapprovalDate,
-                Confirmation = payment.Confirmation,
-                GrossValue = payment.GrossValue,
-                NetValue = payment.NetValue,
-                FlatRate = payment.FlatRate,
-                CardNumber = payment.CardNumber,
-                Installments = new List<InstallmentResult>()
-            };
-
-            foreach (var installment in payment.Installments)
-            {
-                var installmentResult = new InstallmentResult{
-                    Id = installment.Id,
-                    InstallmentGrossValue = installment.InstallmentGrossValue,
-                    InstallmentNetValue = installment.InstallmentNetValue,
-                    InstallmentNumber = installment.InstallmentNumber,
-                    ReceiptDate = installment.ReceiptDate
-                };
-                paymentResult.Installments.Add(installmentResult);
-            }
-                payments.Add(paymentResult);
-        }
-
-        var accountResult = new AccountResult
-        {
-            Id = account.Id,
-            CPF = account.CPF,
-            Agency = account.Agency,
-            HolderName = account.HolderName,
-            Balance = account.Balance,
-            IsActive = account.IsActive,
-            Payments = payments
-        };
+        var result = _manager.ConvertToResult(account);
         
-        return Ok(accountResult);
+        return Ok(result);
     }
 
     [HttpGet("get/cpf/{cpf}")]
@@ -140,50 +57,10 @@ public class AccountController : ControllerBase
 
         if(account == null)
             return NotFound();
-        
-        var payments = new List<PaymentResult>();
-        foreach (var payment in account.Payments)
-        {
-            var paymentResult = new PaymentResult
-            {
-                Id = payment.Id,
-                TransationDate = payment.TransationDate,
-                ApprovalDate = payment.ApprovalDate,
-                DisapprovalDate = payment.DisapprovalDate,
-                Confirmation = payment.Confirmation,
-                GrossValue = payment.GrossValue,
-                NetValue = payment.NetValue,
-                FlatRate = payment.FlatRate,
-                CardNumber = payment.CardNumber,
-                Installments = new List<InstallmentResult>()
-            };
 
-            foreach (var installment in payment.Installments)
-            {
-                var installmentResult = new InstallmentResult{
-                    Id = installment.Id,
-                    InstallmentGrossValue = installment.InstallmentGrossValue,
-                    InstallmentNetValue = installment.InstallmentNetValue,
-                    InstallmentNumber = installment.InstallmentNumber,
-                    ReceiptDate = installment.ReceiptDate
-                };
-                paymentResult.Installments.Add(installmentResult);
-            }
-                payments.Add(paymentResult);
-        }
-
-        var accountResult = new AccountResult
-        {
-            Id = account.Id,
-            CPF = account.CPF,
-            Agency = account.Agency,
-            HolderName = account.HolderName,
-            Balance = account.Balance,
-            IsActive = account.IsActive,
-            Payments = payments
-        };
+        var result = _manager.ConvertToResult(account);
         
-        return Ok(accountResult);
+        return Ok(result);
     }
 
     [HttpPost]
@@ -191,52 +68,11 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> Register(AccountViewModel person) // mudar account pra result
     {
         var account = await _manager.CreateAccount(person);
-        var payments = new List<PaymentResult>();
 
-        foreach (var payment in account.Payments)
-        {
-            var paymentResult = new PaymentResult
-            {
-                Id = payment.Id,
-                TransationDate = payment.TransationDate,
-                ApprovalDate = payment.ApprovalDate,
-                DisapprovalDate = payment.DisapprovalDate,
-                Confirmation = payment.Confirmation,
-                GrossValue = payment.GrossValue,
-                NetValue = payment.NetValue,
-                FlatRate = payment.FlatRate,
-                CardNumber = payment.CardNumber,
-                Installments = new List<InstallmentResult>()
-            };
-
-            foreach (var installment in payment.Installments)
-            {
-                var installmentResult = new InstallmentResult{
-                    Id = installment.Id,
-                    InstallmentGrossValue = installment.InstallmentGrossValue,
-                    InstallmentNetValue = installment.InstallmentNetValue,
-                    InstallmentNumber = installment.InstallmentNumber,
-                    ReceiptDate = installment.ReceiptDate
-                };
-                paymentResult.Installments.Add(installmentResult);
-            }
-                payments.Add(paymentResult);
-        }
-
-        var accountResult = new AccountResult
-        {
-            Id = account.Id,
-            CPF = account.CPF,
-            Agency = account.Agency,
-            HolderName = account.HolderName,
-            Balance = account.Balance,
-            IsActive = account.IsActive,
-            Payments = payments
-        };
-
-            if(account == null)
-                UnprocessableEntity("error");
-            return Ok(accountResult);
+        
+        var result = _manager.ConvertToResult(account);
+        
+        return Ok(result);
     }
 
     [HttpDelete("{id}")]
@@ -247,48 +83,8 @@ public class AccountController : ControllerBase
         if(account == null)
             return BadRequest();
 
-        var payments = new List<PaymentResult>();
-        foreach (var payment in account.Payments)
-        {
-            var paymentResult = new PaymentResult
-            {
-                Id = payment.Id,
-                TransationDate = payment.TransationDate,
-                ApprovalDate = payment.ApprovalDate,
-                DisapprovalDate = payment.DisapprovalDate,
-                Confirmation = payment.Confirmation,
-                GrossValue = payment.GrossValue,
-                NetValue = payment.NetValue,
-                FlatRate = payment.FlatRate,
-                CardNumber = payment.CardNumber,
-                Installments = new List<InstallmentResult>()
-            };
-
-            foreach (var installment in payment.Installments)
-            {
-                var installmentResult = new InstallmentResult{
-                    Id = installment.Id,
-                    InstallmentGrossValue = installment.InstallmentGrossValue,
-                    InstallmentNetValue = installment.InstallmentNetValue,
-                    InstallmentNumber = installment.InstallmentNumber,
-                    ReceiptDate = installment.ReceiptDate
-                };
-                paymentResult.Installments.Add(installmentResult);
-            }
-                payments.Add(paymentResult);
-        }
-
-        var accountResult = new AccountResult
-        {
-            Id = account.Id,
-            CPF = account.CPF,
-            Agency = account.Agency,
-            HolderName = account.HolderName,
-            Balance = account.Balance,
-            IsActive = account.IsActive,
-            Payments = payments
-        };
+        var result = _manager.ConvertToResult(account);
         
-        return Ok(accountResult);
+        return Ok(result);
     }
 }

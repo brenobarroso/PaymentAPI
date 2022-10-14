@@ -6,16 +6,19 @@ namespace api.Validations
     {
         public string EmptyChar { get; set; }
 
-        public CPFAttribute(string eChar)
+        public CPFAttribute()
         {
-            EmptyChar = eChar;
         }
 
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
-            return ((string)value).Contains(EmptyChar)
-                ? new ValidationResult("Atenção! Espaço em  detectado.")
-                : ValidationResult.Success;
+            if(String.IsNullOrWhiteSpace((string)value))
+                return new ValidationResult("Espaço detectado");
+            return ValidationResult.Success;
+
+            // return ((string)value).Contains(EmptyChar)
+            //     ? new ValidationResult("Atenção! Espaço em  detectado.")
+            //     : ValidationResult.Success;
         }
     }
 }

@@ -15,5 +15,4 @@ public class AccountResult
     public float Balance { get; set; }
 
     public bool IsActive { get; set; }
-    public ICollection<PaymentResult> Payments { get; set; }
 }

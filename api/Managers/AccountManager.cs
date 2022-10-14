@@ -41,7 +41,7 @@ public class AccountManager : IAccountManager
     {
         var result = await _context.Accounts.Include(x => x.Payments)
                                             .ThenInclude(x => x.Installments)
-                                            .Where(x => x.Id == idAccount).SingleAsync();
+                                            .Where(x => x.Id == idAccount).SingleOrDefaultAsync();
 
         if (result == null)
             return null;
@@ -84,5 +84,20 @@ public class AccountManager : IAccountManager
         await _context.SaveChangesAsync();
 
         return result;
+    }
+
+    public AccountResult ConvertToResult(Account account)
+    {
+        var accountResult = new AccountResult
+            {
+                Id = account.Id,
+                CPF = account.CPF,
+                Agency = account.Agency,
+                HolderName = account.HolderName,
+                Balance = account.Balance,
+                IsActive = account.IsActive,
+            };
+
+        return accountResult;
     }
 }

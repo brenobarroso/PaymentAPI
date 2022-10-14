@@ -6,7 +6,7 @@ namespace api.Models;
 public class AccountViewModel
 {
     [Required]
-    [CPFAttribute(eChar: " ")]
+    [CPFAttribute]
     [CPFAttributePattern]
     public string CPF { get; set; } = " ";
 
