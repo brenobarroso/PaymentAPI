@@ -38,7 +38,7 @@ public class TransactionsManagerTest
         var newAccount = new Account{
             Id = 2,
             CPF = "12345678901",
-            Balance = 5000f,
+            Balance = 0f,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
             IsActive = true,
@@ -53,6 +53,8 @@ public class TransactionsManagerTest
             IdAccount = newAccount.Id
         };
         var managerAccount = new AccountManager(_context);
+
+        var paymentNetValue = payment.GrossValue - 0.9f;
         
 
         Mock<IAccountManager> test = new Mock<IAccountManager>();
@@ -76,6 +78,7 @@ public class TransactionsManagerTest
         Assert.Null(result.payment.DisapprovalDate);
         Assert.Equal(true, result.payment.Confirmation);
         Assert.Equal(newAccount ,result.payment.Account);
+        Assert.Equal(paymentNetValue, newAccount.Balance);
 
         var auxInstallmentNetValue = (result.payment.NetValue / (float)payment.InstallmentQuantity) - result.payment.FlatRate;
 
