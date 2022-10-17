@@ -78,6 +78,8 @@ public class TransactionsManager : ITransactionsManager
         };
         approvedTransation.NetValue = approvedTransation.GrossValue - approvedTransation.FlatRate;
 
+        query.Balance = (float)(query.Balance + approvedTransation.NetValue);
+
         var listOfInstallments = new List<Installment>();
         
         for(int i = 1; i <= viewModel.InstallmentQuantity; i++)
