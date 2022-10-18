@@ -36,7 +36,7 @@ public class AccountController : ControllerBase
     [HttpGet("get/number/{accountNumber}")]
     [ProducesResponseType(typeof(Account), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetByIdAccount(int accountNumber)
+    public async Task<IActionResult> GetByIdAccount(string accountNumber)
     {
         var account = await _manager.getByAccountNumberAsync(accountNumber);
 

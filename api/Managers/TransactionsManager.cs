@@ -37,7 +37,7 @@ public class TransactionsManager : ITransactionsManager
 
     public async Task<(Payment? payment, bool sucess)> CreatAsync(PaymentViewModel viewModel)
     {
-        var query = await _accountManager.getByAccountNumberAsync(viewModel.IdAccount);
+        var query = await _accountManager.getByAccountNumberAsync(viewModel.AccountNumber);
         if(query == null)
             return (null, false);
 
