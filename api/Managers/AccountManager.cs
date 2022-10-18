@@ -57,12 +57,20 @@ public class AccountManager : IAccountManager
         if(query != null)
             return null;
 
+        var queryLastAccount = await getAllAccountsAsync();
+        if(queryLastAccount == null)
+            return null;
+
+        var lastAccount = queryLastAccount.LastOrDefault();
+        var accountNumber = CreateAccountNumber(lastAccount);
+
         var newAccount = new Account
         {
             CPF = viewModel.CPF,
             Agency = viewModel.Agency,
             HolderName = viewModel.HolderName,
-            IsActive = true
+            IsActive = true,
+            AccountNumber = accountNumber
         };
 
         var payments = new List<Payment>();
@@ -96,8 +104,17 @@ public class AccountManager : IAccountManager
                 HolderName = account.HolderName,
                 Balance = account.Balance,
                 IsActive = account.IsActive,
+                AccountNumber = account.AccountNumber
             };
 
         return accountResult;
+    }
+
+    public string CreateAccountNumber(Account account)
+    {
+        var toInt = Int32.Parse(account.AccountNumber);
+        toInt++;
+        var toString = toInt.ToString().PadLeft(7, '0');
+        return toString;
     }
 }

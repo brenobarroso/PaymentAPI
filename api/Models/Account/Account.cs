@@ -11,6 +11,7 @@ public class Account
     public string CPF { get; set; } = " ";
     [Required]
     public string Agency { get; set; } = " ";
+    [Required]
     public string AccountNumber { get; set; }
     [Required]
     public string HolderName { get; set; } = " ";

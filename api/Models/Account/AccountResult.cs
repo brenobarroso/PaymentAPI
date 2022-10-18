@@ -10,6 +10,8 @@ public class AccountResult
 
     public string Agency { get; set; } = " ";
 
+    public string AccountNumber { get; set; }
+
     public string HolderName { get; set; } = " ";
 
     public float Balance { get; set; }
