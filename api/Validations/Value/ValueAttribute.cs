@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace api.Validations;
+namespace api.Validations.Value;
 
 // Validação se o valor bruto da transação existe e não é negativo.
 public class ValueAttribute : ValidationAttribute // Validação se o valor bruto for passado mas for negativo.

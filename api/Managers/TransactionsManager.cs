@@ -3,14 +3,23 @@ using PaymentAPI.Data;
 using PaymentAPI.Models;
 using api.Models;
 using api.Interfaces;
+using api.Validations;
+using api.Managers;
 
-namespace PaymentAPI.Validations;
+namespace api.Managers;
 
 public class TransactionsManager : ITransactionsManager
 {
     private readonly PaymentDbContext _context;
-    public TransactionsManager(PaymentDbContext context) => _context = context;
+    private readonly IAccountManager _accountManager;
 
+    public TransactionsManager(PaymentDbContext context, IAccountManager accountManager)
+    {
+        _context = context;
+        _accountManager = accountManager;
+    }
+
+    
     public async Task<List<Payment>> getAllAsync()
     {
         var result = await _context.Payments.Include(x => x.Installments).ToListAsync();
@@ -26,8 +35,13 @@ public class TransactionsManager : ITransactionsManager
         return result;
     }
 
-    public async Task<(Payment payment, bool sucess)> CreatAsync(PaymentViewModel viewModel)
+    public async Task<(Payment? payment, bool sucess)> CreatAsync(PaymentViewModel viewModel)
     {
+        var query = await _accountManager.getByAccountNumberAsync(viewModel.IdAccount);
+        if(query == null)
+            return (null, false);
+
+
         if (viewModel.CardNumber.IndexOf("5999") == 0)
         {
             string fourLastDigitsOfCardReproved = viewModel.CardNumber.Substring(viewModel.CardNumber.Length - 4);
@@ -40,7 +54,8 @@ public class TransactionsManager : ITransactionsManager
                 Confirmation = false,
                 GrossValue = viewModel.GrossValue,
                 NetValue = null,
-                CardNumber = fourLastDigitsOfCardReproved
+                CardNumber = fourLastDigitsOfCardReproved,
+                Account = query
             };
 
             await _context.Payments.AddAsync(reprovedTransaction);
@@ -58,7 +73,8 @@ public class TransactionsManager : ITransactionsManager
             DisapprovalDate = null,
             Confirmation = true,
             GrossValue = viewModel.GrossValue,
-            CardNumber = fourLastDigitsOfCardApproved
+            CardNumber = fourLastDigitsOfCardApproved,
+            Account = query
         };
         approvedTransation.NetValue = approvedTransation.GrossValue - approvedTransation.FlatRate;
 
@@ -86,4 +102,5 @@ public class TransactionsManager : ITransactionsManager
 
         return (approvedTransation, true);
     }
+
 }

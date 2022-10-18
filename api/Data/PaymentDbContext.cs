@@ -14,4 +14,5 @@ public class PaymentDbContext : DbContext
 
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Installment> Installments { get; set; }
+    public DbSet<Account> Accounts { get; set; }
 }

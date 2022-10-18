@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PaymentAPI.Data;
@@ -11,9 +12,10 @@ using PaymentAPI.Data;
 namespace PaymentAPI.Migrations
 {
     [DbContext(typeof(PaymentDbContext))]
-    partial class PaymentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221004171048_AccountsOnly")]
+    partial class AccountsOnly
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,7 +45,8 @@ namespace PaymentAPI.Migrations
 
                     b.Property<string>("HolderName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -91,9 +94,6 @@ namespace PaymentAPI.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AccountId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime?>("ApprovalDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -122,8 +122,6 @@ namespace PaymentAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId");
-
                     b.ToTable("Payments");
                 });
 
@@ -136,22 +134,6 @@ namespace PaymentAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Payment");
-                });
-
-            modelBuilder.Entity("PaymentAPI.Models.Payment", b =>
-                {
-                    b.HasOne("api.Models.Account", "Account")
-                        .WithMany("Payments")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-                });
-
-            modelBuilder.Entity("api.Models.Account", b =>
-                {
-                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("PaymentAPI.Models.Payment", b =>

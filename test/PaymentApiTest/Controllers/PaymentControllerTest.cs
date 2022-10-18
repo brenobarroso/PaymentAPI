@@ -28,35 +28,39 @@ public class PaymentControllerTest
     public async Task ShouldListAll()
     {
         // Arrange
-
         var payment = new Payment
         {
             GrossValue = 5000f,
-            CardNumber = "1023654785698745"
+            CardNumber = "1023654785698745",
+            Installments = new List<Installment>()
         };
 
         var payment2 = new Payment
         {
             GrossValue = 5000f,
-            CardNumber = "1023654787498745"
+            CardNumber = "1023654787498745",
+            Installments = new List<Installment>()
         };
 
         var payment3 = new Payment
         {
             GrossValue = 5000f,
-            CardNumber = "1023054785698025"
+            CardNumber = "1023054785698025",
+            Installments = new List<Installment>()
         };
 
         var payment4 = new Payment
         {
             GrossValue = 5000f,
-            CardNumber = "102365478569825"
+            CardNumber = "102365478569825",
+            Installments = new List<Installment>()
         };
 
         var payment5 = new Payment
         {
             GrossValue = 5000f,
-            CardNumber = "1023654485698025"
+            CardNumber = "1023654485698025",
+            Installments = new List<Installment>()
         };
 
         var paymentList = new List<Payment>();
@@ -66,6 +70,8 @@ public class PaymentControllerTest
         paymentList.Add(payment3);
         paymentList.Add(payment4);
         paymentList.Add(payment5);
+
+        await _context.SaveChangesAsync();
 
         var manager = new Mock<ITransactionsManager>();
         manager.Setup(x => x.getAllAsync()).ReturnsAsync(paymentList);
@@ -91,7 +97,8 @@ public class PaymentControllerTest
         var payment = new Payment
         {
             GrossValue = 5000f,
-            CardNumber = "1023654785698745"
+            CardNumber = "1023654785698745",
+            Installments = new List<Installment>()
         };
 
         var manager = new Mock<ITransactionsManager>();
@@ -216,6 +223,7 @@ public class PaymentControllerTest
             NetValue = new Random().NextSingle(),
             FlatRate = new Random().NextSingle(),
             CardNumber = new Random().Next(0, 9999).ToString().PadLeft(4, '0'),
+            Installments = new List<Installment>()
         };
 
         mockedTransation.NetValue = mockedTransation.GrossValue - mockedTransation.FlatRate;
