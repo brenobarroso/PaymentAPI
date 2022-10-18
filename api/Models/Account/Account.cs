@@ -12,7 +12,7 @@ public class Account
     [Required]
     public string Agency { get; set; } = " ";
     [Required]
-    public string AccountNumber { get; set; }
+    public string AccountNumber { get; set; } = " ";
     [Required]
     public string HolderName { get; set; } = " ";
     [Required]

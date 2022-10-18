@@ -37,11 +37,11 @@ public class AccountManager : IAccountManager
         return result;
     }
 
-    public async Task<Account?> getByAccountNumberAsync(int idAccount)
+    public async Task<Account?> getByAccountNumberAsync(string accountNumber)
     {
         var result = await _context.Accounts.Include(x => x.Payments)
                                             .ThenInclude(x => x.Installments)
-                                            .Where(x => x.Id == idAccount).SingleOrDefaultAsync();
+                                            .Where(x => x.AccountNumber == accountNumber).SingleOrDefaultAsync();
 
         if (result == null)
             return null;
