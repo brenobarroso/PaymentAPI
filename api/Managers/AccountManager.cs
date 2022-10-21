@@ -11,18 +11,20 @@ public class AccountManager : IAccountManager
     private readonly PaymentDbContext _context;
     public AccountManager(PaymentDbContext context) => _context = context;
 
-    public async Task<List<Account>> getAllAccountsAsync()
+    public async Task<List<Account>> GetAllAccountsAsync()
     {
         var result = await _context.Accounts
+                                    .Include(x => x.Withdraws)
                                     .Include(x => x.Payments)
                                     .ThenInclude(x => x.Installments)
                                     .ToListAsync();
         return result;
     }
 
-    public async Task<Account?> getByCPFAsync(string cpf)
+    public async Task<Account?> GetByCPFAsync(string cpf)
     {
         var result = await _context.Accounts
+                        .Include(x => x.Withdraws)
                         .Include(x => x.Payments)
                         .ThenInclude(x => x.Installments)
                         .Where(x => x.CPF == cpf)
@@ -37,11 +39,13 @@ public class AccountManager : IAccountManager
         return result;
     }
 
-    public async Task<Account?> getByAccountNumberAsync(string accountNumber)
+    public async Task<Account?> GetByAccountNumberAsync(string accountNumber)
     {
-        var result = await _context.Accounts.Include(x => x.Payments)
-                                            .ThenInclude(x => x.Installments)
-                                            .Where(x => x.AccountNumber == accountNumber).SingleOrDefaultAsync();
+        var result = await _context.Accounts
+                                    .Include(x => x.Withdraws)
+                                    .Include(x => x.Payments)
+                                    .ThenInclude(x => x.Installments)
+                                    .Where(x => x.AccountNumber == accountNumber).SingleOrDefaultAsync();
 
         if (result == null)
             return null;
@@ -53,13 +57,29 @@ public class AccountManager : IAccountManager
 
     public async Task<Account?> CreateAccount(AccountViewModel viewModel)
     {
-        var query = await getByCPFAsync(viewModel.CPF);
+        var query = await GetByCPFAsync(viewModel.CPF);
         if(query != null)
             return null;
 
-        var queryLastAccount = await getAllAccountsAsync();
-        if(queryLastAccount == null)
-            return null;
+        var queryLastAccount = await GetAllAccountsAsync();
+        if(queryLastAccount == null){
+            var firstAccount = new Account
+            {
+                CPF = viewModel.CPF,
+                Agency = viewModel.Agency,
+                HolderName = viewModel.HolderName,
+                IsActive = true,
+                AccountNumber = "0000001"
+            };
+
+            var firstAccountPayments = new List<Payment>();
+            firstAccount.Payments = firstAccountPayments;
+
+            await _context.Accounts.AddAsync(firstAccount);
+            await _context.SaveChangesAsync();
+
+            return firstAccount;
+        }
 
         var lastAccount = queryLastAccount.LastOrDefault();
         var accountNumber = CreateAccountNumber(lastAccount);
@@ -102,9 +122,10 @@ public class AccountManager : IAccountManager
                 CPF = account.CPF,
                 Agency = account.Agency,
                 HolderName = account.HolderName,
-                Balance = account.Balance,
+                Balance = (decimal)account.Balance,
                 IsActive = account.IsActive,
-                AccountNumber = account.AccountNumber
+                AccountNumber = account.AccountNumber,
+                // Withdraws = account.Withdraws
             };
 
         return accountResult;

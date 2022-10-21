@@ -18,7 +18,7 @@ public class AccountController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        var accounts = await _manager.getAllAccountsAsync();
+        var accounts = await _manager.GetAllAccountsAsync();
 
         if(accounts == null)
             return NotFound();
@@ -38,7 +38,7 @@ public class AccountController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetByIdAccount(string accountNumber)
     {
-        var account = await _manager.getByAccountNumberAsync(accountNumber);
+        var account = await _manager.GetByAccountNumberAsync(accountNumber);
 
         if(account == null)
             return NotFound();
@@ -53,7 +53,7 @@ public class AccountController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetByCPF(string cpf)
     {
-        var account = await _manager.getByCPFAsync(cpf);
+        var account = await _manager.GetByCPFAsync(cpf);
 
         if(account == null)
             return NotFound();
@@ -68,8 +68,9 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> Register(AccountViewModel person) // mudar account pra result
     {
         var account = await _manager.CreateAccount(person);
+        if(account == null)
+            return BadRequest();
 
-        
         var result = _manager.ConvertToResult(account);
         
         return Ok(result);
