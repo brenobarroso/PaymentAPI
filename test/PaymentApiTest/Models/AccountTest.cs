@@ -15,8 +15,9 @@ public class AccountTest
             CPF = "12345678901",
             Agency = "0001",
             HolderName = "holderName",
-            Balance = 1f,
-            IsActive = true, 
+            Balance = 1m,
+            IsActive = true,
+            AccountNumber = "0000001" 
         };
 
         var payment = new Payment
@@ -32,15 +33,15 @@ public class AccountTest
     }
 
     [Theory]
-    [InlineData(1, "1234567801", "0001", "Breno Barroso", 1000f, true)]
-    [InlineData(2, "12345678 10", "0001", "Marcus Melo", 1000f, true)]
-    [InlineData(3, "12345678h12", "0001", "Manoel Moreira", 1000f, true)]
-    [InlineData(3, "12345678912", "0001", "Ma", 1000f, true)]
-    [InlineData(3, "123456789120", "0001", "Pedro Munhoz", 1000f, true)]
+    [InlineData(1, "1234567801", "0001", "Breno Barroso", 1000, true)]
+    [InlineData(2, "12345678 10", "0001", "Marcus Melo", 1000, true)]
+    [InlineData(3, "12345678h12", "0001", "Manoel Moreira", 1000, true)]
+    [InlineData(3, "12345678912", "0001", "Ma", 1000, true)]
+    [InlineData(3, "123456789120", "0001", "Pedro Munhoz", 1000, true)]
     [InlineData(3, "12345678912", "0001", "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
          1000f, true)]
     public void AccountIsNotValid(int id, string cpf, string agency,
-                    string holderName, float balance, bool isActive)
+                    string holderName, decimal balance, bool isActive)
     {
         // Arrange
         var account = new Account
@@ -50,7 +51,8 @@ public class AccountTest
             Agency = agency,
             HolderName = holderName,
             Balance = balance,
-            IsActive = isActive
+            IsActive = isActive,
+            AccountNumber = "0000001"
         };
 
         // Act

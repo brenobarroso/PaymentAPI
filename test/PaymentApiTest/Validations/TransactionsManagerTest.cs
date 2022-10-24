@@ -12,6 +12,7 @@ public class TransactionsManagerTest
 {
     protected readonly PaymentDbContext _context;
     protected readonly IAccountManager _manager;
+    private readonly IConvertWithdraw _convert;
     public TransactionsManagerTest()
     {
         var options = new DbContextOptionsBuilder<PaymentDbContext>()
@@ -24,24 +25,25 @@ public class TransactionsManagerTest
     }
 
     [Theory]
-    [InlineData(5000f, "1023654785698745", 1)]
-    [InlineData(5000f, "1023654787498745", 2)]
-    [InlineData(5000f, "1023054785698025", 3)]
-    [InlineData(5000f, "1023654485698025", 4)]
-    [InlineData(5000f, "1023654785098745", 5)]
-    [InlineData(5000f, "1023654787498745", 6)]
-    [InlineData(5000f, "1023054785697725", 7)]
-    [InlineData(5000f, "1027754485698025", 8)]
+    [InlineData(5000, "1023654785698745", 1)]
+    [InlineData(5000, "1023654787498745", 2)]
+    [InlineData(5000, "1023054785698025", 3)]
+    [InlineData(5000, "1023654485698025", 4)]
+    [InlineData(5000, "1023654785098745", 5)]
+    [InlineData(5000, "1023654787498745", 6)]
+    [InlineData(5000, "1023054785697725", 7)]
+    [InlineData(5000, "1027754485698025", 8)]
     public async Task ShouldConvertToApproved(float grossValue, string cardNumber, int installmentQuantity)
     {
         // Arrange
         var newAccount = new Account{
             Id = 2,
             CPF = "12345678901",
-            Balance = 0f,
+            Balance = 0m,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
             IsActive = true,
+            AccountNumber = CreateRandomStringBySize(7),
             Payments = new List<Payment>()
         };
 
@@ -50,16 +52,16 @@ public class TransactionsManagerTest
             GrossValue = grossValue,
             CardNumber = cardNumber,
             InstallmentQuantity = installmentQuantity,
-            IdAccount = newAccount.Id
+            AccountNumber = newAccount.AccountNumber
         };
-        var managerAccount = new AccountManager(_context);
+        var managerAccount = new AccountManager(_context, _convert);
 
-        var paymentNetValue = payment.GrossValue - 0.9f;
+        var paymentNetValue = (decimal)(payment.GrossValue - 0.9f);
         
 
         Mock<IAccountManager> test = new Mock<IAccountManager>();
         
-        test.Setup(x => x.getByAccountNumberAsync(newAccount.Id)).ReturnsAsync(newAccount);
+        test.Setup(x => x.GetByAccountNumberAsync(newAccount.AccountNumber)).ReturnsAsync(newAccount);
         var manager = new TransactionsManager(_context, test.Object);
 
         // Act
@@ -99,19 +101,20 @@ public class TransactionsManagerTest
     }
 
     [Theory]
-    [InlineData(5000f, "5999654785698745", 1)]
-    [InlineData(5000f, "5999654785698785", 1)]
-    [InlineData(5000f, "5999654775698745", 1)]
+    [InlineData(5000, "5999654785698745", 1)]
+    [InlineData(5000, "5999654785698785", 1)]
+    [InlineData(5000, "5999654775698745", 1)]
     public async Task ShouldConvertToReprovedAsync(float grossValue, string cardNumber, int installmentQuantity)
     {
         // Arrange
         var newAccount = new Account{
             Id = 2,
             CPF = "12345678901",
-            Balance = 5000f,
+            Balance = 5000m,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
             IsActive = true,
+            AccountNumber = CreateRandomStringBySize(7),
             Payments = new List<Payment>()
         };
 
@@ -120,14 +123,14 @@ public class TransactionsManagerTest
             GrossValue = grossValue,
             CardNumber = cardNumber,
             InstallmentQuantity = installmentQuantity,
-            IdAccount = newAccount.Id
+            AccountNumber = newAccount.AccountNumber
         };
 
         var managerAccount = new TransactionsManager(_context, _manager);
 
         Mock<IAccountManager> test = new Mock<IAccountManager>();
         
-        test.Setup(x => x.getByAccountNumberAsync(newAccount.Id)).ReturnsAsync(newAccount);
+        test.Setup(x => x.GetByAccountNumberAsync(newAccount.AccountNumber)).ReturnsAsync(newAccount);
         var manager = new TransactionsManager(_context, test.Object);
 
         // Act
@@ -148,4 +151,14 @@ public class TransactionsManagerTest
         Assert.Equal(false, result.payment.Confirmation);
     }
 
+    public static string CreateRandomStringBySize(int size)
+    {
+        var chars = "0123456789";
+        var random = new Random();
+        var result = new string(
+            Enumerable.Repeat(chars, size)
+                    .Select(s => s[random.Next(s.Length)])
+                    .ToArray());
+        return result;
+    }
 }

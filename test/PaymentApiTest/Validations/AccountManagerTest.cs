@@ -1,3 +1,4 @@
+using api.Interfaces;
 using api.Managers;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ namespace PaymentApiTest.Validations;
 public class AccountManagerTest
 {
     protected readonly PaymentDbContext _context;
+    private readonly IConvertWithdraw _convert;
     public AccountManagerTest()
     {
         var options = new DbContextOptionsBuilder<PaymentDbContext>()
@@ -27,14 +29,14 @@ public class AccountManagerTest
         var newAccount = new Account{
             Id = 2,
             CPF = "12345678901",
-            Balance = 5000f,
+            Balance = 5000m,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
             IsActive = true,
             Payments = new List<Payment>()
         };
 
-        var manager = new AccountManager(_context);
+        var manager = new AccountManager(_context, _convert);
         _context.Accounts.Add(newAccount);
         await _context.SaveChangesAsync();
 
@@ -55,7 +57,7 @@ public class AccountManagerTest
             Agency = "00239-9",
         };
 
-        var manager = new AccountManager(_context);
+        var manager = new AccountManager(_context, _convert);
 
         // Act
         var result = manager.CreateAccount(newAccount);
@@ -74,11 +76,11 @@ public class AccountManagerTest
     public async Task ShouldNotBeCreated()
     {
         // Arrange
-        var manager = new AccountManager(_context);
+        var manager = new AccountManager(_context, _convert);
 
         var newAccount1 = new Account{
             CPF = "12345678901",
-            Balance = 5000f,
+            Balance = 5000m,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
             IsActive = true
@@ -86,7 +88,7 @@ public class AccountManagerTest
 
         var newAccount2 = new Account{
             CPF = "12375678901",
-            Balance = 5000f,
+            Balance = 5000m,
             HolderName = "Breno Santos",
             Agency = "00239-9",
             IsActive = true
@@ -94,7 +96,7 @@ public class AccountManagerTest
 
         var newAccount3 = new Account{
             CPF = "12315678901",
-            Balance = 5000f,
+            Balance = 5000m,
             HolderName = "Breno Barroso",
             Agency = "00239-9",
             IsActive = true
@@ -124,11 +126,11 @@ public class AccountManagerTest
     public async Task ShouldListAll()
     {
         // Arrange
-        var manager = new AccountManager(_context);
+        var manager = new AccountManager(_context, _convert);
 
         var newAccount1 = new Account{
-            CPF = "12345678901",
-            Balance = 5000f,
+            CPF = CreateRandomStringBySize(11),
+            Balance = 5000m,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
             IsActive = true,
@@ -136,8 +138,8 @@ public class AccountManagerTest
         };
 
         var newAccount2 = new Account{
-            CPF = "12375678901",
-            Balance = 5000f,
+            CPF = CreateRandomStringBySize(11),
+            Balance = 5000m,
             HolderName = "Breno Santos",
             Agency = "00239-9",
             IsActive = true,
@@ -145,8 +147,8 @@ public class AccountManagerTest
         };
 
         var newAccount3 = new Account{
-            CPF = "12315678901",
-            Balance = 5000f,
+            CPF = CreateRandomStringBySize(11),
+            Balance = 5000m,
             HolderName = "Breno Barroso",
             Agency = "00239-9",
             IsActive = true,
@@ -160,7 +162,7 @@ public class AccountManagerTest
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await manager.getAllAccountsAsync();
+        var result = await manager.GetAllAccountsAsync();
 
         // Assert
         Assert.NotNull(result);
@@ -171,11 +173,11 @@ public class AccountManagerTest
     public async Task ShouldListByCPF()
     {
         // Arrange
-        var manager = new AccountManager(_context);
+        var manager = new AccountManager(_context, _convert);
 
         var newAccount1 = new Account{
-            CPF = "12345678901",
-            Balance = 5000f,
+            CPF = CreateRandomStringBySize(11),
+            Balance = 5000m,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
             IsActive = true,
@@ -183,8 +185,8 @@ public class AccountManagerTest
         };
 
         var newAccount2 = new Account{
-            CPF = "12315678901",
-            Balance = 5000f,
+            CPF = CreateRandomStringBySize(11),
+            Balance = 5000m,
             HolderName = "Breno Santos",
             Agency = "00239-9",
             IsActive = false,
@@ -192,8 +194,8 @@ public class AccountManagerTest
         };
 
         var newAccount3 = new Account{
-            CPF = "12315678901",
-            Balance = 5000f,
+            CPF = CreateRandomStringBySize(11),
+            Balance = 5000m,
             HolderName = "Breno Barroso",
             Agency = "00239-9",
             IsActive = true,
@@ -207,102 +209,7 @@ public class AccountManagerTest
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await manager.getByCPFAsync("12315678901");
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(newAccount3.Id, result.Id);
-
-    }
-
-    [Fact]
-    public async Task ShouldNotListByCPF()
-    {
-        // Arrange
-        var manager = new AccountManager(_context);
-
-        var newAccount1 = new Account{
-            CPF = "12345678901",
-            Balance = 5000f,
-            HolderName = "Breno Santos Barroso",
-            Agency = "00239-9",
-            IsActive = true,
-            Payments = new List<Payment>()
-        };
-
-        var newAccount2 = new Account{
-            CPF = "12315678901",
-            Balance = 5000f,
-            HolderName = "Breno Santos",
-            Agency = "00239-9",
-            IsActive = false,
-            Payments = new List<Payment>()
-        };
-
-        var newAccount3 = new Account{
-            CPF = "12315678900",
-            Balance = 5000f,
-            HolderName = "Breno Barroso",
-            Agency = "00239-9",
-            IsActive = true,
-            Payments = new List<Payment>()
-        };
-
-        _context.Accounts.Add(newAccount1);
-        _context.Accounts.Add(newAccount2);
-        _context.Accounts.Add(newAccount3);
-
-        await _context.SaveChangesAsync();
-
-        // Act
-        var result = await manager.getByCPFAsync("12315678901");
-
-        // Assert
-        Assert.Null(result);
-
-    }
-
-    [Fact]
-    public async Task ShouldListById()
-    {
-        // Arrange
-        var manager = new AccountManager(_context);
-
-        var newAccount1 = new Account{
-            CPF = "12345678901",
-            Balance = 5000f,
-            HolderName = "Breno Santos Barroso",
-            Agency = "00239-9",
-            IsActive = true,
-            Payments = new List<Payment>()
-        };
-
-        var newAccount2 = new Account{
-            CPF = "12315678901",
-            Balance = 5000f,
-            HolderName = "Breno Santos",
-            Agency = "00239-9",
-            IsActive = false,
-            Payments = new List<Payment>()
-        };
-
-        var newAccount3 = new Account{
-            CPF = "12315678901",
-            Balance = 5000f,
-            HolderName = "Breno Barroso",
-            Agency = "00239-9",
-            IsActive = true,
-            Payments = new List<Payment>()
-        };
-
-        _context.Accounts.Add(newAccount1);
-        _context.Accounts.Add(newAccount2);
-        _context.Accounts.Add(newAccount3);
-
-        await _context.SaveChangesAsync();
-
-        // Act
-        var result = await manager.getByAccountNumberAsync(newAccount1.Id);
+        var result = await manager.GetByCPFAsync(newAccount1.CPF);
 
         // Assert
         Assert.NotNull(result);
@@ -311,14 +218,14 @@ public class AccountManagerTest
     }
 
     [Fact]
-    public async Task ShouldNotListById()
+    public async Task ShouldNotListByCPF()
     {
         // Arrange
-        var manager = new AccountManager(_context);
+        var manager = new AccountManager(_context, _convert);
 
         var newAccount1 = new Account{
-            CPF = "12345678901",
-            Balance = 5000f,
+            CPF = CreateRandomStringBySize(11),
+            Balance = 5000m,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
             IsActive = true,
@@ -326,8 +233,8 @@ public class AccountManagerTest
         };
 
         var newAccount2 = new Account{
-            CPF = "12315678901",
-            Balance = 5000f,
+            CPF = CreateRandomStringBySize(11),
+            Balance = 5000m,
             HolderName = "Breno Santos",
             Agency = "00239-9",
             IsActive = false,
@@ -335,8 +242,8 @@ public class AccountManagerTest
         };
 
         var newAccount3 = new Account{
-            CPF = "12315678901",
-            Balance = 5000f,
+            CPF = CreateRandomStringBySize(11),
+            Balance = 5000m,
             HolderName = "Breno Barroso",
             Agency = "00239-9",
             IsActive = true,
@@ -350,10 +257,122 @@ public class AccountManagerTest
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await manager.getByAccountNumberAsync(newAccount2.Id);
+        var result = await manager.GetByCPFAsync("12315678901");
 
         // Assert
         Assert.Null(result);
 
+    }
+
+    [Fact]
+    public async Task ShouldListByAccountNumber()
+    {
+        // Arrange
+        var manager = new AccountManager(_context, _convert);
+
+        var newAccount1 = new Account{
+            CPF = "12345678901",
+            Balance = 5000m,
+            HolderName = "Breno Santos Barroso",
+            Agency = "00239-9",
+            IsActive = true,
+            AccountNumber = CreateRandomStringBySize(7),
+            Payments = new List<Payment>()
+        };
+
+        var newAccount2 = new Account{
+            CPF = "12315678901",
+            Balance = 5000m,
+            HolderName = "Breno Santos",
+            Agency = "00239-9",
+            IsActive = false,
+            AccountNumber = CreateRandomStringBySize(7),
+            Payments = new List<Payment>()
+        };
+
+        var newAccount3 = new Account{
+            CPF = "12315678901",
+            Balance = 5000m,
+            HolderName = "Breno Barroso",
+            Agency = "00239-9",
+            IsActive = true,
+            AccountNumber = CreateRandomStringBySize(7),
+            Payments = new List<Payment>()
+        };
+
+        _context.Accounts.Add(newAccount1);
+        _context.Accounts.Add(newAccount2);
+        _context.Accounts.Add(newAccount3);
+
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = await manager.GetByAccountNumberAsync(newAccount1.AccountNumber);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(newAccount1.AccountNumber, result.AccountNumber);
+
+    }
+
+    [Fact]
+    public async Task ShouldNotListById()
+    {
+        // Arrange
+        var manager = new AccountManager(_context, _convert);
+
+        var newAccount1 = new Account{
+            CPF = CreateRandomStringBySize(11),
+            Balance = 5000m,
+            HolderName = "Breno Santos Barroso",
+            Agency = "00239-9",
+            IsActive = true,
+            AccountNumber = CreateRandomStringBySize(7),
+            Payments = new List<Payment>()
+        };
+
+        var newAccount2 = new Account{
+            CPF = CreateRandomStringBySize(11),
+            Balance = 5000m,
+            HolderName = "Breno Santos",
+            Agency = "00239-9",
+            IsActive = false,
+            AccountNumber = CreateRandomStringBySize(7),
+            Payments = new List<Payment>()
+        };
+
+        var newAccount3 = new Account{
+            CPF = CreateRandomStringBySize(11),
+            Balance = 5000m,
+            HolderName = "Breno Barroso",
+            Agency = "00239-9",
+            IsActive = true,
+            AccountNumber = CreateRandomStringBySize(7),
+            Payments = new List<Payment>()
+        };
+
+        _context.Accounts.Add(newAccount1);
+        _context.Accounts.Add(newAccount2);
+        _context.Accounts.Add(newAccount3);
+
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = await manager.GetByAccountNumberAsync(newAccount2.AccountNumber);
+
+        // Assert
+        Assert.Null(result);
+
+    }
+
+    public static string CreateRandomStringBySize(int size)
+    {
+        var chars = "0123456789";
+        var random = new Random();
+        var result = new string(
+            Enumerable.Repeat(chars, size)
+                    .Select(s => s[random.Next(s.Length)])
+                    .ToArray());
+        return result;
     }
 }
