@@ -1,5 +1,6 @@
 using api.Interfaces;
 using api.Models;
+using api.Models.Withdraw;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Data;
 using PaymentAPI.Models;
@@ -9,7 +10,12 @@ namespace api.Managers;
 public class AccountManager : IAccountManager
 {
     private readonly PaymentDbContext _context;
-    public AccountManager(PaymentDbContext context) => _context = context;
+    private readonly IConvertWithdraw _convert;
+    public AccountManager(PaymentDbContext context, IConvertWithdraw convert)
+    {
+        _context = context;
+        _convert = convert;
+    }
 
     public async Task<List<Account>> GetAllAccountsAsync()
     {
@@ -57,12 +63,8 @@ public class AccountManager : IAccountManager
 
     public async Task<Account?> CreateAccount(AccountViewModel viewModel)
     {
-        var query = await GetByCPFAsync(viewModel.CPF);
-        if(query != null)
-            return null;
-
         var queryLastAccount = await GetAllAccountsAsync();
-        if(queryLastAccount == null){
+        if(queryLastAccount.Count == 0){
             var firstAccount = new Account
             {
                 CPF = viewModel.CPF,
@@ -80,6 +82,10 @@ public class AccountManager : IAccountManager
 
             return firstAccount;
         }
+        
+        var query = await GetByCPFAsync(viewModel.CPF);
+        if(query != null)
+            return null;
 
         var lastAccount = queryLastAccount.LastOrDefault();
         var accountNumber = CreateAccountNumber(lastAccount);
@@ -116,18 +122,28 @@ public class AccountManager : IAccountManager
 
     public AccountResult ConvertToResult(Account account)
     {
-        var accountResult = new AccountResult
-            {
-                Id = account.Id,
-                CPF = account.CPF,
-                Agency = account.Agency,
-                HolderName = account.HolderName,
-                Balance = (decimal)account.Balance,
-                IsActive = account.IsActive,
-                AccountNumber = account.AccountNumber,
-                // Withdraws = account.Withdraws
-            };
+        var withdrawsResult = new List<WithdrawResult>();
 
+        var accountResult = new AccountResult
+        {
+            Id = account.Id,
+            CPF = account.CPF,
+            Agency = account.Agency,
+            HolderName = account.HolderName,
+            Balance = (decimal)account.Balance,
+            IsActive = account.IsActive,
+            AccountNumber = account.AccountNumber,
+        };
+        
+        foreach (var withdraw in account.Withdraws)
+        {
+            var resultWithdraw = _convert.ConvertToResultWithdraw(withdraw);
+            withdrawsResult.Add(resultWithdraw);
+        }
+
+        accountResult.Withdraws = withdrawsResult;
+        
+        _context.SaveChangesAsync();
         return accountResult;
     }
 

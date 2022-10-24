@@ -1,5 +1,6 @@
 using api.Interfaces;
 using api.Models;
+using api.Models.Withdraw;
 using api.Models.Withdraws;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Data;
@@ -24,7 +25,7 @@ public class WithdrawManager : IWithdrawManager
         return result;
     }
 
-    public async Task<(Account? account, bool sucess)> MakeWithdraw (string accountNumber, decimal value)
+    public async Task<(Withdraw? account, bool sucess)> MakeWithdraw (string accountNumber, decimal value)
     {
         var query = await _accountManager.GetByAccountNumberAsync(accountNumber);
         if(query == null)
@@ -43,7 +44,7 @@ public class WithdrawManager : IWithdrawManager
             await _context.Withdraws.AddAsync(reprovedWithdraw);
             await _context.SaveChangesAsync();
 
-            return (query, false);
+            return (reprovedWithdraw, false);
         }
         
         query.Balance = query.Balance - value;
@@ -57,6 +58,6 @@ public class WithdrawManager : IWithdrawManager
         await _context.Withdraws.AddAsync(approvedWithdraw);
         await _context.SaveChangesAsync();
 
-        return (query, true);
+        return (approvedWithdraw, true);
     }
 }

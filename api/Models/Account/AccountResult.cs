@@ -1,3 +1,4 @@
+using api.Models.Withdraw;
 using api.Models.Withdraws;
 using PaymentAPI.Models;
 
@@ -19,5 +20,5 @@ public class AccountResult
 
     public bool IsActive { get; set; }
 
-    public ICollection<api.Models.Withdraws.Withdraw> Withdraws { get; set; }
+    public ICollection<WithdrawResult> Withdraws { get; set; }
 }

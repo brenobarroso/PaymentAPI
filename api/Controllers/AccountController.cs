@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using api.Models;
 using api.Interfaces;
+using api.Models.Withdraw;
+
 namespace PaymentAPI.Controllers;
 
 [Route("api/[controller]")]
@@ -8,10 +10,14 @@ namespace PaymentAPI.Controllers;
 public class AccountController : ControllerBase
 {
     private readonly IAccountManager _manager;
+    private readonly IConvertWithdraw _convertWithdraw;
+    private readonly IWithdrawManager _managerWithdraw;
 
-    public AccountController(IAccountManager manager)
+    public AccountController(IAccountManager manager, IConvertWithdraw convertWithdraw, IWithdrawManager managerWithdraw)
     {
         _manager = manager;
+        _convertWithdraw = convertWithdraw;
+        _managerWithdraw = managerWithdraw;
     }
     
 
@@ -54,12 +60,13 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> GetByCPF(string cpf)
     {
         var account = await _manager.GetByCPFAsync(cpf);
+        var withdrawsResult = new List<WithdrawResult>();
 
         if(account == null)
             return NotFound();
 
         var result = _manager.ConvertToResult(account);
-        
+
         return Ok(result);
     }
 
@@ -87,5 +94,21 @@ public class AccountController : ControllerBase
         var result = _manager.ConvertToResult(account);
         
         return Ok(result);
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> MakeAWithdraw(string accountNumber, decimal value)
+    {
+        var query = await _managerWithdraw.MakeWithdraw(accountNumber, value);
+
+        if(query.account == null)
+            return BadRequest();
+
+        var result = _convertWithdraw.ConvertToResultWithdraw(query.account);
+        
+        if(query.sucess)
+            return Ok(result);
+        
+        return UnprocessableEntity("withdraw reproved");
     }
 }
