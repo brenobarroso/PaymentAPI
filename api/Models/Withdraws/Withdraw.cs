@@ -6,6 +6,7 @@ public class Withdraw
 {
     [Required]
     public Account Account { get; set; }
+    public int AccountId { get; set; }
     public int Id { get; set; }
     public decimal Value { get; set; }
     public DateTime Date { get; set; } = DateTime.UtcNow;
