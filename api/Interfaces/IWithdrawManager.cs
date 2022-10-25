@@ -8,5 +8,6 @@ namespace api.Interfaces
     {
         Task<List<Withdraw>> GetAllWithdrawsAsync();
         Task<(Withdraw? account, bool sucess)> MakeWithdraw (string accountNumber, decimal value);
+        Task<List<WithdrawResult>> GetWithdrawsByIdAsync(int id);
     }
 }

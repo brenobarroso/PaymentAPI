@@ -25,6 +25,34 @@ public class WithdrawManager : IWithdrawManager
         return result;
     }
 
+    public async Task<List<WithdrawResult>> GetWithdrawsByIdAsync(int id)
+    {
+        var result = await _context.Accounts
+                            .Include(x => x.Withdraws)
+                            .Where(x => x.Id == id)
+                            .Where(x => x.IsActive)
+                            .FirstOrDefaultAsync();
+
+        var listOfWithdrawResult = new List<WithdrawResult>();
+
+        foreach (var withdraw in result.Withdraws)
+        {
+            var withdrawResult = new WithdrawResult{
+            Value = withdraw.Value,
+            Date = withdraw.Date,
+            ApprovalDate = withdraw.ApprovalDate,
+            DisapprovalDate = withdraw.DisapprovalDate,
+            Comments = withdraw.Comments,
+            Type = withdraw.Type
+            };
+
+            listOfWithdrawResult.Add(withdrawResult);
+        }
+        await _context.SaveChangesAsync();
+
+        return listOfWithdrawResult;
+    }
+
     public async Task<(Withdraw? account, bool sucess)> MakeWithdraw (string accountNumber, decimal value)
     {
         var query = await _accountManager.GetByAccountNumberAsync(accountNumber);
