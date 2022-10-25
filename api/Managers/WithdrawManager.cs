@@ -37,7 +37,7 @@ public class WithdrawManager : IWithdrawManager
                 Account = query,
                 Value = value,
                 DisapprovalDate = DateTime.UtcNow,
-                Comments = "saldo insuficiente! Por isso reprovado.",
+                Comments = "Saldo insuficiente! Por isso reprovado.",
                 Type = 01
             };
 
