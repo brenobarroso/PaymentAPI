@@ -13,7 +13,7 @@ namespace api.Validations
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             if(String.IsNullOrWhiteSpace((string)value))
-                return new ValidationResult("Espaço detectado");
+                return new ValidationResult("Espaço detectado!");
             return ValidationResult.Success;
 
             // return ((string)value).Contains(EmptyChar)

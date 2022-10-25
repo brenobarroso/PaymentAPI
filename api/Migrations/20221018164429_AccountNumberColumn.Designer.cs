@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PaymentAPI.Data;
@@ -11,9 +12,10 @@ using PaymentAPI.Data;
 namespace PaymentAPI.Migrations
 {
     [DbContext(typeof(PaymentDbContext))]
-    partial class PaymentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221018164429_AccountNumberColumn")]
+    partial class AccountNumberColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,8 +40,8 @@ namespace PaymentAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("numeric");
+                    b.Property<float>("Balance")
+                        .HasColumnType("real");
 
                     b.Property<string>("CPF")
                         .IsRequired()
@@ -85,43 +87,6 @@ namespace PaymentAPI.Migrations
                     b.HasIndex("PaymentId");
 
                     b.ToTable("Installments");
-                });
-
-            modelBuilder.Entity("api.Models.Withdraws.Withdraw", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("ApprovalDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Comments")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("DisapprovalDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("Value")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
-
-                    b.ToTable("Withdraws");
                 });
 
             modelBuilder.Entity("PaymentAPI.Models.Payment", b =>
@@ -179,17 +144,6 @@ namespace PaymentAPI.Migrations
                     b.Navigation("Payment");
                 });
 
-            modelBuilder.Entity("api.Models.Withdraws.Withdraw", b =>
-                {
-                    b.HasOne("api.Models.Account", "Account")
-                        .WithMany("Withdraws")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-                });
-
             modelBuilder.Entity("PaymentAPI.Models.Payment", b =>
                 {
                     b.HasOne("api.Models.Account", "Account")
@@ -204,8 +158,6 @@ namespace PaymentAPI.Migrations
             modelBuilder.Entity("api.Models.Account", b =>
                 {
                     b.Navigation("Payments");
-
-                    b.Navigation("Withdraws");
                 });
 
             modelBuilder.Entity("PaymentAPI.Models.Payment", b =>

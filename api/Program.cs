@@ -15,7 +15,9 @@ var serverDbOptions = new DbContextOptionsBuilder<PaymentDbContext>();
             serverDbOptions.UseNpgsql(builder.Configuration.GetSection("ServerDbSettings")["ConnectionString"]);
 builder.Services.AddSingleton<PaymentDbContext>(new PaymentDbContext(serverDbOptions.Options));
 builder.Services.AddTransient<ITransactionsManager, TransactionsManager>();
+builder.Services.AddTransient<IWithdrawManager, WithdrawManager>();
 builder.Services.AddTransient<IAccountManager, AccountManager>();
+builder.Services.AddTransient<IConvertWithdraw, ConvertWithdraw>();
 var app = builder.Build();
 
 

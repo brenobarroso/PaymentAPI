@@ -1,3 +1,5 @@
+using api.Models.Withdraw;
+using api.Models.Withdraws;
 using PaymentAPI.Models;
 
 namespace api.Models;
@@ -10,9 +12,13 @@ public class AccountResult
 
     public string Agency { get; set; } = " ";
 
+    public string AccountNumber { get; set; }
+
     public string HolderName { get; set; } = " ";
 
-    public float Balance { get; set; }
+    public decimal Balance { get; set; }
 
     public bool IsActive { get; set; }
+
+    public ICollection<WithdrawResult> Withdraws { get; set; }
 }

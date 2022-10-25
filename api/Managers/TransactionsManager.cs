@@ -37,7 +37,7 @@ public class TransactionsManager : ITransactionsManager
 
     public async Task<(Payment? payment, bool sucess)> CreatAsync(PaymentViewModel viewModel)
     {
-        var query = await _accountManager.getByAccountNumberAsync(viewModel.IdAccount);
+        var query = await _accountManager.GetByAccountNumberAsync(viewModel.AccountNumber);
         if(query == null)
             return (null, false);
 
@@ -77,6 +77,8 @@ public class TransactionsManager : ITransactionsManager
             Account = query
         };
         approvedTransation.NetValue = approvedTransation.GrossValue - approvedTransation.FlatRate;
+
+        query.Balance = (query.Balance + (decimal)approvedTransation.NetValue);
 
         var listOfInstallments = new List<Installment>();
         
