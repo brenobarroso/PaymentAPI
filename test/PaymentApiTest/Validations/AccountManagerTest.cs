@@ -1,6 +1,7 @@
 using api.Interfaces;
 using api.Managers;
 using api.Models;
+using api.Models.Withdraws;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Data;
 using PaymentAPI.Models;
@@ -33,7 +34,8 @@ public class AccountManagerTest
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
             IsActive = true,
-            Payments = new List<Payment>()
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>()
         };
 
         var manager = new AccountManager(_context, _convert);
@@ -83,7 +85,9 @@ public class AccountManagerTest
             Balance = 5000m,
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>()
         };
 
         var newAccount2 = new Account{
@@ -91,7 +95,9 @@ public class AccountManagerTest
             Balance = 5000m,
             HolderName = "Breno Santos",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>()
         };
 
         var newAccount3 = new Account{
@@ -99,7 +105,9 @@ public class AccountManagerTest
             Balance = 5000m,
             HolderName = "Breno Barroso",
             Agency = "00239-9",
-            IsActive = true
+            IsActive = true,
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>()
         };
 
         _context.Accounts.Add(newAccount1);
@@ -134,6 +142,8 @@ public class AccountManagerTest
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
             IsActive = true,
+            AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 
@@ -143,6 +153,8 @@ public class AccountManagerTest
             HolderName = "Breno Santos",
             Agency = "00239-9",
             IsActive = true,
+            AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 
@@ -152,6 +164,8 @@ public class AccountManagerTest
             HolderName = "Breno Barroso",
             Agency = "00239-9",
             IsActive = true,
+            AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 
@@ -181,6 +195,8 @@ public class AccountManagerTest
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
             IsActive = true,
+            AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 
@@ -190,6 +206,8 @@ public class AccountManagerTest
             HolderName = "Breno Santos",
             Agency = "00239-9",
             IsActive = false,
+            AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 
@@ -199,6 +217,8 @@ public class AccountManagerTest
             HolderName = "Breno Barroso",
             Agency = "00239-9",
             IsActive = true,
+            AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 
@@ -229,6 +249,8 @@ public class AccountManagerTest
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
             IsActive = true,
+            AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 
@@ -238,6 +260,8 @@ public class AccountManagerTest
             HolderName = "Breno Santos",
             Agency = "00239-9",
             IsActive = false,
+            AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 
@@ -247,6 +271,8 @@ public class AccountManagerTest
             HolderName = "Breno Barroso",
             Agency = "00239-9",
             IsActive = true,
+            AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 
@@ -277,6 +303,7 @@ public class AccountManagerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 
@@ -287,6 +314,7 @@ public class AccountManagerTest
             Agency = "00239-9",
             IsActive = false,
             AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 
@@ -297,6 +325,7 @@ public class AccountManagerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 
@@ -328,6 +357,7 @@ public class AccountManagerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 
@@ -338,6 +368,7 @@ public class AccountManagerTest
             Agency = "00239-9",
             IsActive = false,
             AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 
@@ -348,6 +379,7 @@ public class AccountManagerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = CreateRandomStringBySize(7),
+            Withdraws = new List<Withdraw>(),
             Payments = new List<Payment>()
         };
 

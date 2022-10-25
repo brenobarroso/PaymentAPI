@@ -17,7 +17,7 @@ public class AccountManager : IAccountManager
         _convert = convert;
     }
 
-    public async Task<List<Account>> GetAllAccountsAsync()
+    public async Task<List<Account>> GetAllAccountsAsync() // Tested
     {
         var result = await _context.Accounts
                                     .Include(x => x.Withdraws)
@@ -27,7 +27,7 @@ public class AccountManager : IAccountManager
         return result;
     }
 
-    public async Task<Account?> GetByCPFAsync(string cpf)
+    public async Task<Account?> GetByCPFAsync(string cpf) // Tested
     {
         var result = await _context.Accounts
                         .Include(x => x.Withdraws)
@@ -45,7 +45,7 @@ public class AccountManager : IAccountManager
         return result;
     }
 
-    public async Task<Account?> GetByAccountNumberAsync(string accountNumber)
+    public async Task<Account?> GetByAccountNumberAsync(string accountNumber) // Tested
     {
         var result = await _context.Accounts
                                     .Include(x => x.Withdraws)
@@ -61,7 +61,7 @@ public class AccountManager : IAccountManager
         return result;
     }
 
-    public async Task<Account?> CreateAccount(AccountViewModel viewModel)
+    public async Task<Account?> CreateAccount(AccountViewModel viewModel) // Tested
     {
         var queryLastAccount = await GetAllAccountsAsync();
         if(queryLastAccount.Count == 0){
@@ -108,7 +108,7 @@ public class AccountManager : IAccountManager
         return newAccount;
     }
 
-    public async Task<Account?> DeleteAccount(int idAccount)
+    public async Task<Account?> DeleteAccount(int idAccount) // Tested
     {
         var result = await _context.Accounts.FindAsync(idAccount);
         if (result == null)
