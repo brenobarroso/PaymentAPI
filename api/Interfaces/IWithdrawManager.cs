@@ -6,7 +6,7 @@ namespace api.Interfaces
 {
     public interface IWithdrawManager
     {
-        Task<List<Withdraw>> GetAllWithdrawsAsync();
+        Task<List<WithdrawResult>> GetAllWithdrawsAsync();
         Task<(Withdraw? account, bool sucess)> MakeWithdraw (string accountNumber, decimal value);
         Task<List<WithdrawResult>> GetWithdrawsByIdAsync(int id);
     }

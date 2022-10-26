@@ -1,6 +1,7 @@
 using api.Interfaces;
 using api.Models;
 using api.Models.Withdraw;
+using api.Models.Withdraws;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Data;
 using PaymentAPI.Models;
@@ -75,7 +76,9 @@ public class AccountManager : IAccountManager
             };
 
             var firstAccountPayments = new List<Payment>();
+            var firstAccountWithdraws = new List<Withdraw>();
             firstAccount.Payments = firstAccountPayments;
+            firstAccount.Withdraws = firstAccountWithdraws;
 
             await _context.Accounts.AddAsync(firstAccount);
             await _context.SaveChangesAsync();
@@ -100,7 +103,9 @@ public class AccountManager : IAccountManager
         };
 
         var payments = new List<Payment>();
+        var withdraws = new List<Withdraw>();
         newAccount.Payments = payments;
+        newAccount.Withdraws = withdraws;
 
         await _context.Accounts.AddAsync(newAccount);
         await _context.SaveChangesAsync();

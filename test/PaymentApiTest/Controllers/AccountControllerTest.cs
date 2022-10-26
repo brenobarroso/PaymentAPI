@@ -102,7 +102,7 @@ public class AccountControllerTest
         var accountController = new AccountController(manager.Object, _convert, _manager);
 
         // Act
-        var result = (OkObjectResult)await accountController.GetByIdAccount(newAccount1.AccountNumber);
+        var result = (OkObjectResult)await accountController.GetByAccountNumber(newAccount1.AccountNumber);
 
         // Assert
         Assert.Equal(200, result.StatusCode);
@@ -120,7 +120,7 @@ public class AccountControllerTest
         var accountController = new AccountController(manager.Object, _convert, _manager);
 
         // Act
-        var result = (NotFoundResult)await accountController.GetByIdAccount(accountNumber);
+        var result = (NotFoundResult)await accountController.GetByAccountNumber(accountNumber);
 
         // Assert
         Assert.Equal(404, result.StatusCode);

@@ -18,9 +18,19 @@ public class WithdrawManager : IWithdrawManager
         _accountManager = accountManager;
     }
 
-    public async Task<List<Withdraw>> GetAllWithdrawsAsync()
+    public async Task<List<WithdrawResult>> GetAllWithdrawsAsync()
     {
-        var result = await _context.Withdraws.ToListAsync();
+        var result = await _context.Withdraws
+                            .Select(x => new WithdrawResult{
+                                Id = x.AccountId,
+                                Value = x.Value,
+                                Date = x.Date,
+                                ApprovalDate = x.ApprovalDate,
+                                DisapprovalDate = x.DisapprovalDate,
+                                Comments = x.Comments,
+                                Type = x.Type
+                            })
+                            .ToListAsync();
 
         return result;
     }
@@ -30,6 +40,7 @@ public class WithdrawManager : IWithdrawManager
         var result = await _context.Withdraws
                             .Where(x => x.AccountId == accountId)
                             .Select(x => new WithdrawResult{
+                                Id = x.AccountId,
                                 Value = x.Value,
                                 Date = x.Date,
                                 ApprovalDate = x.ApprovalDate,
