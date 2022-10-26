@@ -70,6 +70,81 @@ public class WithdrawManagerTest
         // Assert
         Assert.NotNull(result);
         Assert.Equal(3, result.Count);
+        Assert.Equal("Saque genérico.", result.First().Comments);
+    }
+
+    [Fact]
+    public async Task ShouldListById()
+    {
+        // Arrange
+        var manager = new WithdrawManager(_context, _accountManager);
+
+        var withdraw1 = new Withdraw{
+            AccountId = 1,
+            Value = 150m,
+            Date = DateTime.UtcNow,
+            ApprovalDate = null,
+            DisapprovalDate = DateTime.UtcNow,
+            Comments = "Saque genérico.",
+            Type = 1
+        };
+
+        var withdraw2 = new Withdraw{
+            AccountId = 1,
+            Value = 100m,
+            Date = DateTime.UtcNow,
+            ApprovalDate = DateTime.UtcNow,
+            DisapprovalDate = null,
+            Comments = "Saque genérico.",
+            Type = 1
+        };
+
+        _context.Withdraws.Add(withdraw1);
+        _context.Withdraws.Add(withdraw2);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = await manager.GetWithdrawsByIdAsync(1);
+
+        // Assert
+        Assert.Equal(2, result.Count);
+    }
+
+    [Fact]
+    public async Task ShouldNotListById()
+    {
+        // Arrange
+        var manager = new WithdrawManager(_context, _accountManager);
+
+        var withdraw1 = new Withdraw{
+            AccountId = 1,
+            Value = 150m,
+            Date = DateTime.UtcNow,
+            ApprovalDate = null,
+            DisapprovalDate = DateTime.UtcNow,
+            Comments = "Saque genérico.",
+            Type = 1
+        };
+
+        var withdraw2 = new Withdraw{
+            AccountId = 1,
+            Value = 100m,
+            Date = DateTime.UtcNow,
+            ApprovalDate = DateTime.UtcNow,
+            DisapprovalDate = null,
+            Comments = "Saque genérico.",
+            Type = 1
+        };
+
+        _context.Withdraws.Add(withdraw1);
+        _context.Withdraws.Add(withdraw2);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = await manager.GetWithdrawsByIdAsync(3);
+
+        // Assert
+        Assert.Equal(0, result.Count);
     }
 
     [Fact]

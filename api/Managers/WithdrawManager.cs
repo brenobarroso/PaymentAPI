@@ -18,7 +18,7 @@ public class WithdrawManager : IWithdrawManager
         _accountManager = accountManager;
     }
 
-    public async Task<List<WithdrawResult>> GetAllWithdrawsAsync()
+    public async Task<List<WithdrawResult>> GetAllWithdrawsAsync() // Tested
     {
         var result = await _context.Withdraws
                             .Select(x => new WithdrawResult{
