@@ -144,4 +144,192 @@ public class WithdrawControllerTest
         Assert.Equal(200, result.StatusCode);
 
     }
+
+    [Fact]
+    public async Task ShoudNotListById()
+    {
+        // Arrange
+        Random random = new Random();
+        int randomValue = random.Next();
+        var manager = new Mock<IWithdrawManager>();
+        manager.Setup(x => x.GetWithdrawsByIdAsync(randomValue)).ReturnsAsync(new List<WithdrawResult>());
+
+        var withdrawController = new WithdrawController(_convertWithdraw ,manager.Object);
+
+        // Act
+        var result = (NotFoundObjectResult)await withdrawController.GetById(randomValue);
+
+        // Assert
+        Assert.Equal(404, result.StatusCode);
+    }
+
+    [Theory]
+    [InlineData("0000001", 1)]
+    public async Task ShouldMakeAWithdraw(string accountValue, decimal value)
+    {
+        // Arrange
+
+        var viewModel = new WithdrawViewModel
+        {
+            AccountNumber = accountValue,
+            Value = value
+        };
+
+       var newAccount1 = new Account
+        {
+            CPF = "12345678901",
+            Balance = 5000m,
+            HolderName = "Breno Santos Barroso",
+            Agency = "00239-9",
+            IsActive = true,
+            AccountNumber = "0000001",
+            Withdraws = new List<Withdraw>(),
+            Payments = new List<Payment>()
+        };
+
+        var mockedWithdraw = new Withdraw
+        {
+            Account = newAccount1,
+            AccountId = newAccount1.Id,
+            Id = 1,
+            Value = viewModel.Value,
+            Date = DateTime.UtcNow,
+            ApprovalDate = DateTime.UtcNow,
+            DisapprovalDate = null,
+            Type = 1,
+            Comments = "Saque genérico."
+        };
+
+        var withdrawApprovedResult = new WithdrawResult{
+                Id = mockedWithdraw.Id,
+                Value = mockedWithdraw.Value,
+                Date = mockedWithdraw.Date,
+                ApprovalDate = mockedWithdraw.ApprovalDate,
+                DisapprovalDate = mockedWithdraw.DisapprovalDate,
+                Comments = mockedWithdraw.Comments,
+                Type = mockedWithdraw.Type
+        };
+        
+        _context.Accounts.Add(newAccount1);
+        await _context.SaveChangesAsync();
+
+
+        var manager = new Mock<IWithdrawManager>();
+        manager.Setup(x => x.MakeWithdraw(accountValue, value)).ReturnsAsync((withdrawApprovedResult, true));
+
+        var withdrawController = new WithdrawController(_convertWithdraw ,manager.Object);
+
+
+        // Act
+        var result = (OkObjectResult)await withdrawController.MakeAWithdraw(viewModel);
+
+        // Assert
+        Assert.Equal(200, result.StatusCode);
+    }
+
+    [Theory]
+    [InlineData("0000001", 10000)]
+    public async Task ShouldNotMakeAWithdraw(string accountValue, decimal value)
+    {
+        // Arrange
+
+        var viewModel = new WithdrawViewModel
+        {
+            AccountNumber = accountValue,
+            Value = value
+        };
+
+       var newAccount1 = new Account
+        {
+            CPF = "12345678901",
+            Balance = 5000m,
+            HolderName = "Breno Santos Barroso",
+            Agency = "00239-9",
+            IsActive = true,
+            AccountNumber = "0000001",
+            Withdraws = new List<Withdraw>(),
+            Payments = new List<Payment>()
+        };
+
+        var mockedWithdraw = new Withdraw
+        {
+            Account = newAccount1,
+            AccountId = newAccount1.Id,
+            Id = 1,
+            Value = viewModel.Value,
+            Date = DateTime.UtcNow,
+            ApprovalDate = DateTime.UtcNow,
+            DisapprovalDate = null,
+            Type = 1,
+            Comments = "Saque genérico."
+        };
+
+        var withdrawReprovedResult = new WithdrawResult{
+                Id = mockedWithdraw.Id,
+                Value = mockedWithdraw.Value,
+                Date = mockedWithdraw.Date,
+                ApprovalDate = mockedWithdraw.ApprovalDate,
+                DisapprovalDate = mockedWithdraw.DisapprovalDate,
+                Comments = mockedWithdraw.Comments,
+                Type = mockedWithdraw.Type
+        };
+        
+        _context.Accounts.Add(newAccount1);
+        await _context.SaveChangesAsync();
+
+
+        var manager = new Mock<IWithdrawManager>();
+        manager.Setup(x => x.MakeWithdraw(accountValue, value)).ReturnsAsync((withdrawReprovedResult, false));
+
+        var withdrawController = new WithdrawController(_convertWithdraw ,manager.Object);
+
+
+        // Act
+        var result = (UnprocessableEntityObjectResult)await withdrawController.MakeAWithdraw(viewModel);
+
+        // Assert
+        Assert.Equal(422, result.StatusCode);
+    }
+
+    [Theory]
+    [InlineData("0000001", 10000)]
+    [InlineData("0000002", 1500)]
+    public async Task ShouldNotMakeAWithdrawByInvalidInput(string accountValue, decimal value)
+    {
+        // Arrange
+
+        var viewModel = new WithdrawViewModel
+        {
+            AccountNumber = accountValue,
+            Value = value
+        };
+
+       var newAccount1 = new Account
+        {
+            CPF = "12345678901",
+            Balance = 5000m,
+            HolderName = "Breno Santos Barroso",
+            Agency = "00239-9",
+            IsActive = true,
+            AccountNumber = "0000001",
+            Withdraws = new List<Withdraw>(),
+            Payments = new List<Payment>()
+        };
+
+        _context.Accounts.Add(newAccount1);
+        await _context.SaveChangesAsync();
+
+
+        var manager = new Mock<IWithdrawManager>();
+        manager.Setup(x => x.MakeWithdraw(accountValue, value)).ReturnsAsync(((WithdrawResult)null, false));
+
+        var withdrawController = new WithdrawController(_convertWithdraw ,manager.Object);
+
+
+        // Act
+        var result = (BadRequestResult)await withdrawController.MakeAWithdraw(viewModel);
+
+        // Assert
+        Assert.Equal(400, result.StatusCode);
+    }
 }

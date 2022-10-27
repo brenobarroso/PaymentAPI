@@ -1,4 +1,5 @@
 using api.Interfaces;
+using api.Models.Withdraw;
 using api.Models.Withdraws;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,17 +43,15 @@ public class WithdrawController : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> MakeAWithdraw(string accountNumber, decimal value)
+    public async Task<IActionResult> MakeAWithdraw(WithdrawViewModel viewModel)
     {
-        var query = await _managerWithdraw.MakeWithdraw(accountNumber, value);
+        var query = await _managerWithdraw.MakeWithdraw(viewModel.AccountNumber, viewModel.Value);
 
-        if(query.account == null)
+        if(query.withdraw == null)
             return BadRequest();
 
-        var result = _convertWithdraw.ConvertToResultWithdraw(query.account);
-        
         if(query.sucess)
-            return Ok(result);
+            return Ok(query.withdraw);
         
         return UnprocessableEntity("withdraw reproved");
     }

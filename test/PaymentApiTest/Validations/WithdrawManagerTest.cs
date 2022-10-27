@@ -174,12 +174,11 @@ public class WithdrawManagerTest
         var result = await manager.MakeWithdraw(accountForTest.AccountNumber, 150m);
        
         // Assert
-        Assert.Equal("Aprovado! Retirado R$ " + 150m + " restando R$ " + 1350m + ".", result.account.Comments);
-        Assert.Equal(accountForTest.AccountNumber, result.account.Account.AccountNumber);
-        Assert.Equal(DateTime.UtcNow.Date, result.account.ApprovalDate.Value.Date);
-        Assert.Null(result.account.DisapprovalDate);
-        Assert.Equal(01, result.account.Type);
-        Assert.Equal(150m, result.account.Value);
+        Assert.Equal("Aprovado! Retirado R$ " + 150m + " restando R$ " + 1350m + ".", result.withdraw.Comments);
+        Assert.Equal(DateTime.UtcNow.Date, result.withdraw.ApprovalDate.Value.Date);
+        Assert.Null(result.withdraw.DisapprovalDate);
+        Assert.Equal(01, result.withdraw.Type);
+        Assert.Equal(150m, result.withdraw.Value);
         Assert.Equal(true, result.sucess);
     }
 
@@ -210,12 +209,11 @@ public class WithdrawManagerTest
         var result = await manager.MakeWithdraw(accountForTest.AccountNumber, 2000m);
        
         // Assert
-        Assert.Equal("Saldo insuficiente! Por isso reprovado.", result.account.Comments);
-        Assert.Equal(accountForTest.AccountNumber, result.account.Account.AccountNumber);
-        Assert.Equal(DateTime.UtcNow.Date, result.account.DisapprovalDate.Value.Date);
-        Assert.Null(result.account.ApprovalDate);
-        Assert.Equal(01, result.account.Type);
-        Assert.Equal(2000m, result.account.Value);
+        Assert.Equal("Saldo insuficiente! Por isso reprovado.", result.withdraw.Comments);
+        Assert.Equal(DateTime.UtcNow.Date, result.withdraw.DisapprovalDate.Value.Date);
+        Assert.Null(result.withdraw.ApprovalDate);
+        Assert.Equal(01, result.withdraw.Type);
+        Assert.Equal(2000m, result.withdraw.Value);
         Assert.Equal(false, result.sucess);
     }
 }

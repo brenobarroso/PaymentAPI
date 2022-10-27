@@ -53,7 +53,7 @@ public class WithdrawManager : IWithdrawManager
         return result;
     }
 
-    public async Task<(Withdraw? account, bool sucess)> MakeWithdraw (string accountNumber, decimal value)
+    public async Task<(WithdrawResult? withdraw, bool sucess)> MakeWithdraw (string accountNumber, decimal value)
     {
         var query = await _accountManager.GetByAccountNumberAsync(accountNumber);
         if(query == null)
@@ -69,10 +69,20 @@ public class WithdrawManager : IWithdrawManager
                 Type = 01
             };
 
+            var withdrawReprovedResult = new WithdrawResult{
+                Id = reprovedWithdraw.Id,
+                Value = reprovedWithdraw.Value,
+                Date = reprovedWithdraw.Date,
+                ApprovalDate = reprovedWithdraw.ApprovalDate,
+                DisapprovalDate = reprovedWithdraw.DisapprovalDate,
+                Comments = reprovedWithdraw.Comments,
+                Type = reprovedWithdraw.Type
+            };
+
             await _context.Withdraws.AddAsync(reprovedWithdraw);
             await _context.SaveChangesAsync();
 
-            return (reprovedWithdraw, false);
+            return (withdrawReprovedResult, false);
         }
         
         query.Balance = query.Balance - value;
@@ -83,9 +93,20 @@ public class WithdrawManager : IWithdrawManager
             Comments = "Aprovado! Retirado R$ " + value + " restando R$ " + query.Balance + ".",
             Type = 01
         };
+
+        var withdrawApprovedResult = new WithdrawResult{
+                Id = approvedWithdraw.Id,
+                Value = approvedWithdraw.Value,
+                Date = approvedWithdraw.Date,
+                ApprovalDate = approvedWithdraw.ApprovalDate,
+                DisapprovalDate = approvedWithdraw.DisapprovalDate,
+                Comments = approvedWithdraw.Comments,
+                Type = approvedWithdraw.Type
+        };
+
         await _context.Withdraws.AddAsync(approvedWithdraw);
         await _context.SaveChangesAsync();
 
-        return (approvedWithdraw, true);
+        return (withdrawApprovedResult, true);
     }
 }
