@@ -1,6 +1,6 @@
-using System;
 using api.Interfaces;
 using api.Models;
+using api.Models.Movements;
 using api.Models.Withdraws;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +37,9 @@ public class AccountControllerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = "0000001",
-            Payments = new List<Payment>()
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var newAccount2 = new Account
@@ -48,7 +50,9 @@ public class AccountControllerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = "0000002",
-            Payments = new List<Payment>()
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var newAccount3 = new Account
@@ -59,7 +63,9 @@ public class AccountControllerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = "0000003",
-            Payments = new List<Payment>()
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var accountList = new List<Account>();
@@ -92,7 +98,9 @@ public class AccountControllerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = CreateRandomStringBySize(11),
-            Payments = new List<Payment>()
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var manager = new Mock<IAccountManager>();
@@ -138,7 +146,9 @@ public class AccountControllerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = CreateRandomStringBySize(11),
-            Payments = new List<Payment>()
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var manager = new Mock<IAccountManager>();
@@ -188,7 +198,9 @@ public class AccountControllerTest
             Agency = mockedAccount.Agency,
             IsActive = true,
             AccountNumber = CreateRandomStringBySize(11),
-            Payments = new List<Payment>()
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var manager = new Mock<IAccountManager>();
@@ -222,8 +234,9 @@ public class AccountControllerTest
             Agency = mockedAccount.Agency,
             IsActive = true,
             AccountNumber = CreateRandomStringBySize(11),
+            Payments = new List<Payment>(),
             Withdraws = new List<Withdraw>(),
-            Payments = new List<Payment>()
+            Movements = new List<Movement>()
         };
 
         var manager = new Mock<IAccountManager>();
@@ -252,7 +265,9 @@ public class AccountControllerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = CreateRandomStringBySize(11),
-            Payments = new List<Payment>()
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var manager = new Mock<IAccountManager>();
