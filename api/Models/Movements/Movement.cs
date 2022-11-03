@@ -20,10 +20,7 @@ public class Movement
     [Required]
     public DateTime Date { get; set; }
 
-    [Required]
-    public decimal NetValue { get; set; }
-
-    public decimal? GrossValue { get; set; }
+   public decimal Value { get; set; }
 
     [Required]
     public string Comments { get; set; } = " ";

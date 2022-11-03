@@ -102,9 +102,8 @@ public class TransactionsManager : ITransactionsManager
 
         var newMovement = new Movement{
             Date = DateTime.UtcNow,
-            NetValue = (decimal)approvedTransation.NetValue,
-            GrossValue = (decimal)approvedTransation.GrossValue,
-            Comments = " " + DateTime.UtcNow.Date + " - " + DateTime.UtcNow.Hour + ":" + DateTime.UtcNow.Minute +
+            Value = (decimal)approvedTransation.NetValue,
+            Comments = " " + DateTime.UtcNow.Date.ToString("dd/MM/yyyy") + " - " + DateTime.UtcNow.Hour + ":" + DateTime.UtcNow.Minute +
                  " R$" + approvedTransation.NetValue + 
                  " entrada - pagamento cartão - " + "transação em " + viewModel.InstallmentQuantity + 
                  " vezes no cartão de final " + fourLastDigitsOfCardApproved + ".",

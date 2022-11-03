@@ -107,9 +107,8 @@ public class WithdrawManager : IWithdrawManager
 
         var newMovement = new Movement{
             Date = DateTime.UtcNow,
-            NetValue = (decimal)approvedWithdraw.Value,
-            GrossValue = null,
-            Comments = " " + DateTime.UtcNow.Date + " - " + DateTime.UtcNow.Hour + ":" + DateTime.UtcNow.Minute +
+            Value = (decimal)approvedWithdraw.Value,
+            Comments = " " + DateTime.UtcNow.Date.ToString("dd/MM/yyyy") + " - " + DateTime.UtcNow.Hour + ":" + DateTime.UtcNow.Minute +
                 " R$" + approvedWithdraw.Value + " saída - saque.",
             Withdraw = approvedWithdraw,
             Payment = null,

@@ -26,14 +26,10 @@ public class ExtractManager : IExtractManager
                                     Id = x.Id,
                                     AccountId = x.AccountId,
                                     Date = x.Date,
-                                    NetValue = x.NetValue,
-                                    GrossValue = null,
+                                    Value = x.Value,
                                     Comments = x.Comments
                                 })
                                 .ToListAsync();
-
-        string extractHeader = $"***Extrato da conta {movements.First().AccountId} - {DateTime.UtcNow.Date}*** ";
-        result.Add(extractHeader);
 
         foreach (var movement in movements)
         {
