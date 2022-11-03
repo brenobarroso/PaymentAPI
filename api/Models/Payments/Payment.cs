@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using api.Models;
+using api.Models.Movements;
 
 namespace PaymentAPI.Models;
 
@@ -15,14 +16,14 @@ public class Payment
     public DateTime? DisapprovalDate { get; set; } = null;// Data de reprovação (caso ocorra)
     public bool Confirmation { get; set; } // Confirmação da adquirente
     [Required]
-    public float GrossValue { get; set; } // Valor bruto da transação
-    public float? NetValue { get; set; } = null; // Valor líquido da transação (descontado taxa)
+    public decimal GrossValue { get; set; } // Valor bruto da transação
+    public decimal? NetValue { get; set; } = null; // Valor líquido da transação (descontado taxa)
 
     [Required]
-    public float? FlatRate { get; set; } = 0.9f;// Taxa fixa cobrada
+    public decimal? FlatRate { get; set; } = 0.9m;// Taxa fixa cobrada
 
     [Required]
     public string CardNumber { get; set; } = " ";// 4 ultimos digitos do cartão
-
+    public Movement? Movement { get; set; }
     public ICollection<Installment> Installments { get; set; } // Lista das parcelas
 }

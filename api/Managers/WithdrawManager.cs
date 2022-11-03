@@ -1,5 +1,6 @@
 using api.Interfaces;
 using api.Models;
+using api.Models.Movements;
 using api.Models.Withdraw;
 using api.Models.Withdraws;
 using Microsoft.EntityFrameworkCore;
@@ -103,6 +104,19 @@ public class WithdrawManager : IWithdrawManager
                 Comments = approvedWithdraw.Comments,
                 Type = approvedWithdraw.Type
         };
+
+        var newMovement = new Movement{
+            Date = DateTime.UtcNow,
+            NetValue = (decimal)approvedWithdraw.Value,
+            GrossValue = null,
+            Comments = " " + DateTime.UtcNow.Date + " - " + DateTime.UtcNow.Hour + ":" + DateTime.UtcNow.Minute +
+                "R$" + approvedWithdraw.Value + " saída - saque.",
+            Withdraw = approvedWithdraw,
+            Payment = null,
+            Account = query
+        };
+
+        approvedWithdraw.Movement = newMovement;
 
         await _context.Withdraws.AddAsync(approvedWithdraw);
         await _context.SaveChangesAsync();

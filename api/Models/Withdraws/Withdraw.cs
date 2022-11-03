@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using api.Models.Movements;
 
 namespace api.Models.Withdraws;
 
@@ -14,4 +15,5 @@ public class Withdraw
     public DateTime? DisapprovalDate { get; set; } = null;
     public string Comments { get; set; } = " ";
     public int Type { get; set; }
+    public Movement Movement { get; set; }
 }

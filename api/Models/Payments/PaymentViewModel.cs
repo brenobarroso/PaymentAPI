@@ -8,7 +8,7 @@ public class PaymentViewModel
 {
     [Required]
     [ValueAttribute]
-    public float GrossValue { get; set; } // Valor bruto da transação.
+    public decimal GrossValue { get; set; } // Valor bruto da transação.
 
     [Required]
     [CardNumberAttribute(eChar: " ")]

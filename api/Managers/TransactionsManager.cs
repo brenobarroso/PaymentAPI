@@ -5,6 +5,7 @@ using api.Models;
 using api.Interfaces;
 using api.Validations;
 using api.Managers;
+using api.Models.Movements;
 
 namespace api.Managers;
 
@@ -78,7 +79,7 @@ public class TransactionsManager : ITransactionsManager
         };
         approvedTransation.NetValue = approvedTransation.GrossValue - approvedTransation.FlatRate;
 
-        query.Balance = (query.Balance + (decimal)approvedTransation.NetValue);
+        query.Balance = ((decimal)(query.Balance + approvedTransation.NetValue));
 
         var listOfInstallments = new List<Installment>();
         
@@ -88,16 +89,31 @@ public class TransactionsManager : ITransactionsManager
             {
                 ReceiptDate = DateTime.UtcNow.AddDays(30 * i),
                 InstallmentNumber = i,
-                InstallmentGrossValue = (float)(viewModel.GrossValue / (float)viewModel.InstallmentQuantity),
+                InstallmentGrossValue = (viewModel.GrossValue / viewModel.InstallmentQuantity),
             };
 
-            newInstallment.InstallmentNetValue = (float)(((approvedTransation.NetValue ) / viewModel.InstallmentQuantity) - approvedTransation.FlatRate);
+            newInstallment.InstallmentNetValue = ((decimal)(((approvedTransation.NetValue ) / viewModel.InstallmentQuantity) - approvedTransation.FlatRate));
             
             listOfInstallments.Add(newInstallment);
 
             approvedTransation.Installments = listOfInstallments;
             newInstallment.Payment = approvedTransation;
         }
+
+        var newMovement = new Movement{
+            Date = DateTime.UtcNow,
+            NetValue = (decimal)approvedTransation.NetValue,
+            GrossValue = (decimal)approvedTransation.GrossValue,
+            Comments = " " + DateTime.UtcNow.Date + " - " + DateTime.UtcNow.Hour + ":" + DateTime.UtcNow.Minute +
+                 "R$" + approvedTransation.NetValue + 
+                 " entrada - pagamento cartão - " + "transação em " + viewModel.InstallmentQuantity + 
+                 " vezes no cartão de final " + fourLastDigitsOfCardApproved + ".",
+            Withdraw = null,
+            Payment = approvedTransation,
+            Account = query
+        };
+
+        approvedTransation.Movement = newMovement;
 
         await _context.Payments.AddAsync(approvedTransation);
         await _context.SaveChangesAsync();

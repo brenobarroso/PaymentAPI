@@ -64,7 +64,7 @@ public class AccountController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Register(AccountViewModel person) // mudar account pra result
+    public async Task<IActionResult> Register(AccountViewModel person)
     {
         var account = await _manager.CreateAccount(person);
         if(account == null)
@@ -76,7 +76,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> MakeInactive(int id) // mudar account pra result
+    public async Task<IActionResult> MakeInactive(int id)
     {
         var account = await _manager.DeleteAccount(id);
 

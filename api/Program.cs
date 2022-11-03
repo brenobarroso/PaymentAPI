@@ -17,6 +17,7 @@ builder.Services.AddSingleton<PaymentDbContext>(new PaymentDbContext(serverDbOpt
 builder.Services.AddTransient<ITransactionsManager, TransactionsManager>();
 builder.Services.AddTransient<IWithdrawManager, WithdrawManager>();
 builder.Services.AddTransient<IAccountManager, AccountManager>();
+builder.Services.AddTransient<IExtractManager, ExtractManager>();
 builder.Services.AddTransient<IConvertWithdraw, ConvertWithdraw>();
 var app = builder.Build();
 
