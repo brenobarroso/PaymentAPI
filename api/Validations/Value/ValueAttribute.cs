@@ -7,7 +7,7 @@ public class ValueAttribute : ValidationAttribute // Validação se o valor brut
 {
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
-        return value == null || (float)value <= 0
+        return value == null || (decimal)value <= 0
             ? new ValidationResult(ErrorMessage = "Valor Negativo")
             : ValidationResult.Success;
     }

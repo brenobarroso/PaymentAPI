@@ -105,7 +105,7 @@ public class TransactionsManager : ITransactionsManager
             NetValue = (decimal)approvedTransation.NetValue,
             GrossValue = (decimal)approvedTransation.GrossValue,
             Comments = " " + DateTime.UtcNow.Date + " - " + DateTime.UtcNow.Hour + ":" + DateTime.UtcNow.Minute +
-                 "R$" + approvedTransation.NetValue + 
+                 " R$" + approvedTransation.NetValue + 
                  " entrada - pagamento cartão - " + "transação em " + viewModel.InstallmentQuantity + 
                  " vezes no cartão de final " + fourLastDigitsOfCardApproved + ".",
             Withdraw = null,

@@ -5,11 +5,11 @@ namespace api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class MovementController : ControllerBase
+public class ExtractController : ControllerBase
 {
     private readonly IExtractManager _manager;
 
-    public MovementController(IExtractManager manager)
+    public ExtractController(IExtractManager manager)
     {
         _manager = manager;
     }
@@ -21,8 +21,8 @@ public class MovementController : ControllerBase
     {
         var movements = await _manager.GetByAccountIdAsync(accountId);
 
-        if(movements == null || movements.Count == 0)
-            return NotFound("Sorry, was not found any movement for this Id!");
+        if(movements == null || movements.Count <= 1)
+            return NotFound($"Desculpa, não foram encontradas movimentações para conta {accountId}.");
 
         return Ok(movements);
     }

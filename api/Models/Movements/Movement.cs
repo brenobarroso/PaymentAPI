@@ -23,7 +23,6 @@ public class Movement
     [Required]
     public decimal NetValue { get; set; }
 
-    [Required]
     public decimal? GrossValue { get; set; }
 
     [Required]

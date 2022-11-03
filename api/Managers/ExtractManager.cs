@@ -16,9 +16,11 @@ public class ExtractManager : IExtractManager
         _accountManager = accountManager;
     }
 
-    public async Task<List<MovementResult>> GetByAccountIdAsync(int accountId)
+    public async Task<List<string>> GetByAccountIdAsync(int accountId)
     {
-        var result = await _context.Movements
+        var result = new List<string>();
+
+        var movements = await _context.Movements
                                 .Where(x => x.AccountId == accountId)
                                 .Select(x => new MovementResult{
                                     Id = x.Id,
@@ -29,6 +31,14 @@ public class ExtractManager : IExtractManager
                                     Comments = x.Comments
                                 })
                                 .ToListAsync();
+
+        string extractHeader = $"***Extrato da conta {movements.First().AccountId} - {DateTime.UtcNow.Date}*** ";
+        result.Add(extractHeader);
+
+        foreach (var movement in movements)
+        {
+            result.Add(movement.Comments);
+        }
 
         return result;
     }

@@ -110,7 +110,7 @@ public class WithdrawManager : IWithdrawManager
             NetValue = (decimal)approvedWithdraw.Value,
             GrossValue = null,
             Comments = " " + DateTime.UtcNow.Date + " - " + DateTime.UtcNow.Hour + ":" + DateTime.UtcNow.Minute +
-                "R$" + approvedWithdraw.Value + " saída - saque.",
+                " R$" + approvedWithdraw.Value + " saída - saque.",
             Withdraw = approvedWithdraw,
             Payment = null,
             Account = query
