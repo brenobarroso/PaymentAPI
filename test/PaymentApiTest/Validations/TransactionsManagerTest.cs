@@ -33,7 +33,7 @@ public class TransactionsManagerTest
     [InlineData(5000, "1023654787498745", 6)]
     [InlineData(5000, "1023054785697725", 7)]
     [InlineData(5000, "1027754485698025", 8)]
-    public async Task ShouldConvertToApproved(float grossValue, string cardNumber, int installmentQuantity)
+    public async Task ShouldConvertToApproved(decimal grossValue, string cardNumber, int installmentQuantity)
     {
         // Arrange
         var newAccount = new Account{
@@ -56,7 +56,7 @@ public class TransactionsManagerTest
         };
         var managerAccount = new AccountManager(_context, _convert);
 
-        var paymentNetValue = (decimal)(payment.GrossValue - 0.9f);
+        var paymentNetValue = (decimal)(payment.GrossValue - 0.9m);
         
 
         Mock<IAccountManager> test = new Mock<IAccountManager>();
@@ -82,7 +82,7 @@ public class TransactionsManagerTest
         Assert.Equal(newAccount ,result.payment.Account);
         Assert.Equal(paymentNetValue, newAccount.Balance);
 
-        var auxInstallmentNetValue = (result.payment.NetValue / (float)payment.InstallmentQuantity) - result.payment.FlatRate;
+        var auxInstallmentNetValue = (result.payment.NetValue / payment.InstallmentQuantity) - result.payment.FlatRate;
 
         Assert.All(result.payment.Installments, 
                     p => Assert.NotNull(p.Id));
@@ -94,7 +94,7 @@ public class TransactionsManagerTest
         Assert.All(result.payment.Installments, 
                     p => Assert.Equal(auxInstallmentNetValue, p.InstallmentNetValue));
         Assert.All(result.payment.Installments, 
-                    p => Assert.Equal((payment.GrossValue / (float)payment.InstallmentQuantity)
+                    p => Assert.Equal((payment.GrossValue / payment.InstallmentQuantity)
                         , p.InstallmentGrossValue));
         Assert.All(result.payment.Installments, 
                     p => Assert.NotNull(p.InstallmentNumber));
@@ -104,7 +104,7 @@ public class TransactionsManagerTest
     [InlineData(5000, "5999654785698745", 1)]
     [InlineData(5000, "5999654785698785", 1)]
     [InlineData(5000, "5999654775698745", 1)]
-    public async Task ShouldConvertToReprovedAsync(float grossValue, string cardNumber, int installmentQuantity)
+    public async Task ShouldConvertToReprovedAsync(decimal grossValue, string cardNumber, int installmentQuantity)
     {
         // Arrange
         var newAccount = new Account{
