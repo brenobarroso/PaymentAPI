@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PaymentAPI.Data;
@@ -11,9 +12,10 @@ using PaymentAPI.Data;
 namespace PaymentAPI.Migrations
 {
     [DbContext(typeof(PaymentDbContext))]
-    partial class PaymentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221025180455_AddAccountId")]
+    partial class AddAccountId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,11 +67,11 @@ namespace PaymentAPI.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("InstallmentGrossValue")
-                        .HasColumnType("numeric");
+                    b.Property<float>("InstallmentGrossValue")
+                        .HasColumnType("real");
 
-                    b.Property<decimal>("InstallmentNetValue")
-                        .HasColumnType("numeric");
+                    b.Property<float>("InstallmentNetValue")
+                        .HasColumnType("real");
 
                     b.Property<int>("InstallmentNumber")
                         .HasColumnType("integer");
@@ -85,46 +87,6 @@ namespace PaymentAPI.Migrations
                     b.HasIndex("PaymentId");
 
                     b.ToTable("Installments");
-                });
-
-            modelBuilder.Entity("api.Models.Movements.Movement", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Comments")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("PaymentId")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("Value")
-                        .HasColumnType("numeric");
-
-                    b.Property<int?>("WithdrawId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
-
-                    b.HasIndex("PaymentId")
-                        .IsUnique();
-
-                    b.HasIndex("WithdrawId")
-                        .IsUnique();
-
-                    b.ToTable("Movements");
                 });
 
             modelBuilder.Entity("api.Models.Withdraws.Withdraw", b =>
@@ -188,15 +150,15 @@ namespace PaymentAPI.Migrations
                     b.Property<DateTime?>("DisapprovalDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal?>("FlatRate")
+                    b.Property<float?>("FlatRate")
                         .IsRequired()
-                        .HasColumnType("numeric");
+                        .HasColumnType("real");
 
-                    b.Property<decimal>("GrossValue")
-                        .HasColumnType("numeric");
+                    b.Property<float>("GrossValue")
+                        .HasColumnType("real");
 
-                    b.Property<decimal?>("NetValue")
-                        .HasColumnType("numeric");
+                    b.Property<float?>("NetValue")
+                        .HasColumnType("real");
 
                     b.Property<DateTime>("TransationDate")
                         .HasColumnType("timestamp with time zone");
@@ -217,29 +179,6 @@ namespace PaymentAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Payment");
-                });
-
-            modelBuilder.Entity("api.Models.Movements.Movement", b =>
-                {
-                    b.HasOne("api.Models.Account", "Account")
-                        .WithMany("Movements")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PaymentAPI.Models.Payment", "Payment")
-                        .WithOne("Movement")
-                        .HasForeignKey("api.Models.Movements.Movement", "PaymentId");
-
-                    b.HasOne("api.Models.Withdraws.Withdraw", "Withdraw")
-                        .WithOne("Movement")
-                        .HasForeignKey("api.Models.Movements.Movement", "WithdrawId");
-
-                    b.Navigation("Account");
-
-                    b.Navigation("Payment");
-
-                    b.Navigation("Withdraw");
                 });
 
             modelBuilder.Entity("api.Models.Withdraws.Withdraw", b =>
@@ -266,24 +205,14 @@ namespace PaymentAPI.Migrations
 
             modelBuilder.Entity("api.Models.Account", b =>
                 {
-                    b.Navigation("Movements");
-
                     b.Navigation("Payments");
 
                     b.Navigation("Withdraws");
                 });
 
-            modelBuilder.Entity("api.Models.Withdraws.Withdraw", b =>
-                {
-                    b.Navigation("Movement")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("PaymentAPI.Models.Payment", b =>
                 {
                     b.Navigation("Installments");
-
-                    b.Navigation("Movement");
                 });
 #pragma warning restore 612, 618
         }

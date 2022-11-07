@@ -30,35 +30,35 @@ public class PaymentControllerTest
         // Arrange
         var payment = new Payment
         {
-            GrossValue = 5000f,
+            GrossValue = 5000,
             CardNumber = "1023654785698745",
             Installments = new List<Installment>()
         };
 
         var payment2 = new Payment
         {
-            GrossValue = 5000f,
+            GrossValue = 5000,
             CardNumber = "1023654787498745",
             Installments = new List<Installment>()
         };
 
         var payment3 = new Payment
         {
-            GrossValue = 5000f,
+            GrossValue = 5000,
             CardNumber = "1023054785698025",
             Installments = new List<Installment>()
         };
 
         var payment4 = new Payment
         {
-            GrossValue = 5000f,
+            GrossValue = 5000,
             CardNumber = "102365478569825",
             Installments = new List<Installment>()
         };
 
         var payment5 = new Payment
         {
-            GrossValue = 5000f,
+            GrossValue = 5000,
             CardNumber = "1023654485698025",
             Installments = new List<Installment>()
         };
@@ -96,7 +96,7 @@ public class PaymentControllerTest
         var id = new Random().Next();
         var payment = new Payment
         {
-            GrossValue = 5000f,
+            GrossValue = 5000,
             CardNumber = "1023654785698745",
             Installments = new List<Installment>()
         };
@@ -147,9 +147,9 @@ public class PaymentControllerTest
             ApprovalDate = DateTime.UtcNow,
             DisapprovalDate = null,
             Confirmation = true,
-            GrossValue = new Random().NextSingle(),
-            NetValue = new Random().NextSingle(),
-            FlatRate = new Random().NextSingle(),
+            GrossValue = new Random().Next(),
+            NetValue = new Random().Next(),
+            FlatRate = new Random().Next(),
             CardNumber = new Random().Next(0, 9999).ToString().PadLeft(4, '0'),
             Installments = new List<Installment>()
         };
@@ -219,9 +219,9 @@ public class PaymentControllerTest
             ApprovalDate = null,
             DisapprovalDate = DateTime.UtcNow,
             Confirmation = false,
-            GrossValue = new Random().NextSingle(),
-            NetValue = new Random().NextSingle(),
-            FlatRate = new Random().NextSingle(),
+            GrossValue = new Random().Next(),
+            NetValue = new Random().Next(),
+            FlatRate = new Random().Next(),
             CardNumber = new Random().Next(0, 9999).ToString().PadLeft(4, '0'),
             Installments = new List<Installment>()
         };

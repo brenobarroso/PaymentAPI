@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using api.Models.Movements;
 using api.Models.Withdraws;
 using PaymentAPI.Models;
 
@@ -23,4 +24,5 @@ public class Account
     public bool IsActive { get; set; } = true;
     public ICollection<Payment> Payments { get; set; } // transações de uma conta.
     public ICollection<api.Models.Withdraws.Withdraw> Withdraws { get; set; }
+    public ICollection<Movement> Movements { get; set; }
 }

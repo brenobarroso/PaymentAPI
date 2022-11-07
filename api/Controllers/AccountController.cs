@@ -10,17 +10,9 @@ namespace PaymentAPI.Controllers;
 public class AccountController : ControllerBase
 {
     private readonly IAccountManager _manager;
-    private readonly IConvertWithdraw _convertWithdraw;
-    private readonly IWithdrawManager _managerWithdraw;
 
-    public AccountController(IAccountManager manager, IConvertWithdraw convertWithdraw, IWithdrawManager managerWithdraw)
-    {
-        _manager = manager;
-        _convertWithdraw = convertWithdraw;
-        _managerWithdraw = managerWithdraw;
-    }
+    public AccountController(IAccountManager manager){_manager = manager;}
     
-
     [HttpGet]
     public async Task<IActionResult> Get()
     {
@@ -42,7 +34,7 @@ public class AccountController : ControllerBase
     [HttpGet("get/number/{accountNumber}")]
     [ProducesResponseType(typeof(Account), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetByIdAccount(string accountNumber)
+    public async Task<IActionResult> GetByAccountNumber(string accountNumber)
     {
         var account = await _manager.GetByAccountNumberAsync(accountNumber);
 
@@ -72,7 +64,7 @@ public class AccountController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Register(AccountViewModel person) // mudar account pra result
+    public async Task<IActionResult> Register(AccountViewModel person)
     {
         var account = await _manager.CreateAccount(person);
         if(account == null)
@@ -84,7 +76,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> MakeInactive(int id) // mudar account pra result
+    public async Task<IActionResult> MakeInactive(int id)
     {
         var account = await _manager.DeleteAccount(id);
 
@@ -94,21 +86,5 @@ public class AccountController : ControllerBase
         var result = _manager.ConvertToResult(account);
         
         return Ok(result);
-    }
-
-    [HttpPut]
-    public async Task<IActionResult> MakeAWithdraw(string accountNumber, decimal value)
-    {
-        var query = await _managerWithdraw.MakeWithdraw(accountNumber, value);
-
-        if(query.account == null)
-            return BadRequest();
-
-        var result = _convertWithdraw.ConvertToResultWithdraw(query.account);
-        
-        if(query.sucess)
-            return Ok(result);
-        
-        return UnprocessableEntity("withdraw reproved");
     }
 }

@@ -9,6 +9,7 @@ public class ConvertWithdraw : IConvertWithdraw
     public WithdrawResult ConvertToResultWithdraw(Withdraw withdraw)
     {
         var withdrawResult = new WithdrawResult{
+            Id = withdraw.Id,
             Value = withdraw.Value,
             Date = withdraw.Date,
             ApprovalDate = withdraw.ApprovalDate,

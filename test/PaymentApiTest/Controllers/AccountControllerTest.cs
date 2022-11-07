@@ -1,6 +1,7 @@
-using System;
 using api.Interfaces;
 using api.Models;
+using api.Models.Movements;
+using api.Models.Withdraws;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -13,8 +14,6 @@ namespace PaymentApiTest.Controllers;
 public class AccountControllerTest
 {
     protected readonly PaymentDbContext _context;
-    private readonly IConvertWithdraw _convert;
-    private readonly IWithdrawManager _manager;
     public AccountControllerTest()
     {
         var options = new DbContextOptionsBuilder<PaymentDbContext>()
@@ -38,7 +37,9 @@ public class AccountControllerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = "0000001",
-            Payments = new List<Payment>()
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var newAccount2 = new Account
@@ -49,7 +50,9 @@ public class AccountControllerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = "0000002",
-            Payments = new List<Payment>()
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var newAccount3 = new Account
@@ -60,7 +63,9 @@ public class AccountControllerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = "0000003",
-            Payments = new List<Payment>()
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var accountList = new List<Account>();
@@ -72,7 +77,7 @@ public class AccountControllerTest
         var manager = new Mock<IAccountManager>();
         manager.Setup(x => x.GetAllAccountsAsync()).ReturnsAsync(accountList);
 
-        var accountController = new AccountController(manager.Object, _convert, _manager);
+        var accountController = new AccountController(manager.Object);
 
         // Act
         var result = (OkObjectResult)await accountController.Get();
@@ -93,16 +98,18 @@ public class AccountControllerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = CreateRandomStringBySize(11),
-            Payments = new List<Payment>()
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var manager = new Mock<IAccountManager>();
         manager.Setup(x => x.GetByAccountNumberAsync(newAccount1.AccountNumber)).ReturnsAsync(newAccount1);
 
-        var accountController = new AccountController(manager.Object, _convert, _manager);
+        var accountController = new AccountController(manager.Object);
 
         // Act
-        var result = (OkObjectResult)await accountController.GetByIdAccount(newAccount1.AccountNumber);
+        var result = (OkObjectResult)await accountController.GetByAccountNumber(newAccount1.AccountNumber);
 
         // Assert
         Assert.Equal(200, result.StatusCode);
@@ -117,10 +124,10 @@ public class AccountControllerTest
         var manager = new Mock<IAccountManager>();
         manager.Setup(x => x.GetByAccountNumberAsync(accountNumber)).ReturnsAsync((Account)null);
 
-        var accountController = new AccountController(manager.Object, _convert, _manager);
+        var accountController = new AccountController(manager.Object);
 
         // Act
-        var result = (NotFoundResult)await accountController.GetByIdAccount(accountNumber);
+        var result = (NotFoundResult)await accountController.GetByAccountNumber(accountNumber);
 
         // Assert
         Assert.Equal(404, result.StatusCode);
@@ -138,13 +145,16 @@ public class AccountControllerTest
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
             IsActive = true,
-            Payments = new List<Payment>()
+            AccountNumber = CreateRandomStringBySize(11),
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var manager = new Mock<IAccountManager>();
         manager.Setup(x => x.GetByCPFAsync(newAccount1.CPF)).ReturnsAsync(newAccount1);
 
-        var accountController = new AccountController(manager.Object, _convert, _manager);
+        var accountController = new AccountController(manager.Object);
 
         // Act
         var result = (OkObjectResult)await accountController.GetByCPF(newAccount1.CPF);
@@ -161,7 +171,7 @@ public class AccountControllerTest
         var manager = new Mock<IAccountManager>();
         manager.Setup(x => x.GetByCPFAsync(randomCPF)).ReturnsAsync((Account)null);
 
-        var accountController = new AccountController(manager.Object, _convert, _manager);
+        var accountController = new AccountController(manager.Object);
 
         // Act
         var result = (NotFoundResult)await accountController.GetByCPF("15423458741");
@@ -187,13 +197,16 @@ public class AccountControllerTest
             HolderName = mockedAccount.HolderName,
             Agency = mockedAccount.Agency,
             IsActive = true,
-            Payments = new List<Payment>()
+            AccountNumber = CreateRandomStringBySize(11),
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var manager = new Mock<IAccountManager>();
         manager.Setup(x => x.CreateAccount(mockedAccount)).ReturnsAsync(newAccount);
 
-        var accountController = new AccountController(manager.Object, _convert, _manager);
+        var accountController = new AccountController(manager.Object);
 
         // Act
         var result = (OkObjectResult)await accountController.Register(mockedAccount);
@@ -220,20 +233,23 @@ public class AccountControllerTest
             HolderName = mockedAccount.HolderName,
             Agency = mockedAccount.Agency,
             IsActive = true,
-            Payments = new List<Payment>()
+            AccountNumber = CreateRandomStringBySize(11),
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var manager = new Mock<IAccountManager>();
-        manager.Setup(x => x.CreateAccount(mockedAccount)).ReturnsAsync(newAccount);
+        manager.Setup(x => x.CreateAccount(mockedAccount)).ReturnsAsync((Account)null);
 
-        var accountController = new AccountController(manager.Object, _convert, _manager);
+        var accountController = new AccountController(manager.Object);
 
         // Act
-        var result = (UnprocessableEntityResult)await accountController.Register(mockedAccount);
+        var result = (BadRequestResult)await accountController.Register(mockedAccount);
 
         // Assert
 
-        Assert.Equal(422, result.StatusCode);
+        Assert.Equal(400, result.StatusCode);
     }
 
     [Fact]
@@ -248,13 +264,16 @@ public class AccountControllerTest
             HolderName = "Breno Santos Barroso",
             Agency = "00239-9",
             IsActive = true,
-            Payments = new List<Payment>()
+            AccountNumber = CreateRandomStringBySize(11),
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var manager = new Mock<IAccountManager>();
         manager.Setup(x => x.DeleteAccount(id)).ReturnsAsync(newAccount1);
 
-        var accountController = new AccountController(manager.Object, _convert, _manager);
+        var accountController = new AccountController(manager.Object);
 
         // Act
         var result = (OkObjectResult)await accountController.MakeInactive(id);

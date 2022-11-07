@@ -5,6 +5,8 @@ using api.Managers;
 using api.Interfaces;
 using PaymentAPI.Models;
 using Moq;
+using api.Models.Withdraws;
+using api.Models.Movements;
 
 namespace PaymentApiTest.Validations;
 
@@ -33,7 +35,7 @@ public class TransactionsManagerTest
     [InlineData(5000, "1023654787498745", 6)]
     [InlineData(5000, "1023054785697725", 7)]
     [InlineData(5000, "1027754485698025", 8)]
-    public async Task ShouldConvertToApproved(float grossValue, string cardNumber, int installmentQuantity)
+    public async Task ShouldConvertToApproved(decimal grossValue, string cardNumber, int installmentQuantity)
     {
         // Arrange
         var newAccount = new Account{
@@ -44,7 +46,9 @@ public class TransactionsManagerTest
             Agency = "00239-9",
             IsActive = true,
             AccountNumber = CreateRandomStringBySize(7),
-            Payments = new List<Payment>()
+            Payments = new List<Payment>(),
+            Withdraws = new List<Withdraw>(),
+            Movements = new List<Movement>()
         };
 
         var payment = new PaymentViewModel
@@ -56,7 +60,7 @@ public class TransactionsManagerTest
         };
         var managerAccount = new AccountManager(_context, _convert);
 
-        var paymentNetValue = (decimal)(payment.GrossValue - 0.9f);
+        var paymentNetValue = (decimal)(payment.GrossValue - 0.9m);
         
 
         Mock<IAccountManager> test = new Mock<IAccountManager>();
@@ -82,7 +86,18 @@ public class TransactionsManagerTest
         Assert.Equal(newAccount ,result.payment.Account);
         Assert.Equal(paymentNetValue, newAccount.Balance);
 
-        var auxInstallmentNetValue = (result.payment.NetValue / (float)payment.InstallmentQuantity) - result.payment.FlatRate;
+        Assert.NotNull(result.payment.Movement);
+        Assert.Equal(result.payment.Account, result.payment.Movement.Account);
+        Assert.Equal(result.payment.NetValue, result.payment.Movement.Value);
+        Assert.Equal(DateTime.UtcNow.Date, result.payment.Movement.Date.Date);
+        Assert.Equal(newAccount, result.payment.Movement.Account);
+        Assert.Equal(newAccount.Id, result.payment.Movement.AccountId);
+        Assert.Equal(result.payment, result.payment.Movement.Payment);
+        Assert.Equal(result.payment.Id, result.payment.Movement.PaymentId);
+        Assert.Null(result.payment.Movement.Withdraw);
+        Assert.Null(result.payment.Movement.WithdrawId);
+
+        var auxInstallmentNetValue = (result.payment.NetValue / payment.InstallmentQuantity) - result.payment.FlatRate;
 
         Assert.All(result.payment.Installments, 
                     p => Assert.NotNull(p.Id));
@@ -94,7 +109,7 @@ public class TransactionsManagerTest
         Assert.All(result.payment.Installments, 
                     p => Assert.Equal(auxInstallmentNetValue, p.InstallmentNetValue));
         Assert.All(result.payment.Installments, 
-                    p => Assert.Equal((payment.GrossValue / (float)payment.InstallmentQuantity)
+                    p => Assert.Equal((payment.GrossValue / payment.InstallmentQuantity)
                         , p.InstallmentGrossValue));
         Assert.All(result.payment.Installments, 
                     p => Assert.NotNull(p.InstallmentNumber));
@@ -104,7 +119,7 @@ public class TransactionsManagerTest
     [InlineData(5000, "5999654785698745", 1)]
     [InlineData(5000, "5999654785698785", 1)]
     [InlineData(5000, "5999654775698745", 1)]
-    public async Task ShouldConvertToReprovedAsync(float grossValue, string cardNumber, int installmentQuantity)
+    public async Task ShouldConvertToReprovedAsync(decimal grossValue, string cardNumber, int installmentQuantity)
     {
         // Arrange
         var newAccount = new Account{
