@@ -77,6 +77,7 @@ public class TransactionsManager : ITransactionsManager
             CardNumber = fourLastDigitsOfCardApproved,
             Account = query
         };
+        
         approvedTransation.NetValue = approvedTransation.GrossValue - approvedTransation.FlatRate;
 
         query.Balance = ((decimal)(query.Balance + approvedTransation.NetValue));
