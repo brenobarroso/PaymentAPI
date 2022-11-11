@@ -17,9 +17,9 @@ public class ExtractController : ControllerBase
     [HttpGet("get/{accountId}")]
     [ProducesResponseType(typeof(api.Models.Movements.Movement), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetByIdAsync(int accountId)
+    public async Task<IActionResult> GetByIdAsync(int accountId, int startIndex, int extractCount)
     {
-        var movements = await _manager.GetByAccountIdAsync(accountId);
+        var movements = await _manager.GetByAccountIdAsync(accountId, startIndex, extractCount);
 
         if(movements == null || movements.Count <= 1)
             return NotFound($"Desculpa, não foram encontradas movimentações para conta {accountId}.");

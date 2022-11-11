@@ -16,9 +16,16 @@ public class ExtractManager : IExtractManager
         _accountManager = accountManager;
     }
 
-    public async Task<List<string>> GetByAccountIdAsync(int accountId)
+    public async Task<List<string>> GetByAccountIdAsync(int accountId, int startIndex, int extractCount)
     {
-        var result = new List<string>();
+        int defaultValeuExtract = 10; // valor default da quantidade de itens no extrato;
+        int maximumValueExtract = 90; // valor maximo da quantidade de itens no extrato;
+
+        // Validação quantidade de itens
+        if(extractCount == 0 || extractCount == null) extractCount = defaultValeuExtract; // trata caso o valor passado seja 0 ou nulo.
+        if(extractCount >= maximumValueExtract) extractCount = maximumValueExtract; // trata caso o valor seja maior que o máximo permitido.
+
+        var query = new List<string>();
 
         var movements = await _context.Movements
                                 .Where(x => x.AccountId == accountId)
@@ -33,8 +40,14 @@ public class ExtractManager : IExtractManager
 
         foreach (var movement in movements)
         {
-            result.Add(movement.Comments);
+            query.Add(movement.Comments);
         }
+
+        // Validar indice de inicio
+        if(startIndex < 0 || startIndex == null) startIndex = 0;
+        if(startIndex > query.Count) startIndex = query.Count;
+
+        var result = query.GetRange(startIndex, extractCount);
 
         return result;
     }
