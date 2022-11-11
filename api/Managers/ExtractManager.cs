@@ -45,8 +45,12 @@ public class ExtractManager : IExtractManager
 
         // Validar indice de inicio
         if(startIndex < 0 || startIndex == null) startIndex = 0;
-        if(startIndex > query.Count) startIndex = query.Count;
-
+        if(startIndex >= query.Count)
+        {
+            var emptyList = new List<string>();
+            return emptyList;
+        }
+            
         var result = query.GetRange(startIndex, extractCount);
 
         return result;

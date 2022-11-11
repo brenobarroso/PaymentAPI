@@ -74,23 +74,59 @@ public class ExtractControllerTest
             AccountId = 2
         };
 
+        var movement4 = new Movement{
+            Date = DateTime.UtcNow,
+            Value = (decimal)1500m,
+            Comments = "String genérica.",
+            Withdraw = null,
+            Payment = new Payment(),
+            Account = account,
+            AccountId = account.Id
+        };
+
+        var movement5 = new Movement{
+            Date = DateTime.UtcNow,
+            Value = (decimal)1500m,
+            Comments = "String genérica.",
+            Withdraw = null,
+            Payment = new Payment(),
+            Account = account,
+            AccountId = account.Id
+        };
+
+        var movement6 = new Movement{
+            Date = DateTime.UtcNow,
+            Value = (decimal)1500m,
+            Comments = "String genérica.",
+            Withdraw = null,
+            Payment = new Payment(),
+            Account = account,
+            AccountId = account.Id
+        };
+
         account.Movements.Add(movement1);
         account.Movements.Add(movement2);
+        account.Movements.Add(movement4);
+        account.Movements.Add(movement5);
+        account.Movements.Add(movement6);
 
         _context.Accounts.Add(account);
         var movements = new List<string>{
+            "String genérica.",
+            "String genérica.",
+            "String genérica.",
             "String genérica.",
             "String genérica."
         };
         await _context.SaveChangesAsync();
 
         var manager = new Mock<IExtractManager>();
-        manager.Setup(x => x.GetByAccountIdAsync(id)).ReturnsAsync(movements);
+        manager.Setup(x => x.GetByAccountIdAsync(id, 0, 5)).ReturnsAsync(movements);
 
         var extractController = new ExtractController(manager.Object);
 
         // Act
-        var result = (OkObjectResult)await extractController.GetByIdAsync(id);
+        var result = (OkObjectResult)await extractController.GetByIdAsync(id, 0, 5);
 
         // Assert
         Assert.Equal(200, result.StatusCode);
