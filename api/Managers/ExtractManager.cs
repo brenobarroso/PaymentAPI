@@ -16,19 +16,24 @@ public class ExtractManager : IExtractManager
         _accountManager = accountManager;
     }
 
-    public async Task<List<string>> GetByAccountIdAsync(int accountId, int startIndex, int extractCount)
+    public async Task<List<string>> GetByAccountIdAsync(int accountId, int index, int lenth)
     {
         int defaultValeuExtract = 10; // valor default da quantidade de itens no extrato;
         int maximumValueExtract = 90; // valor maximo da quantidade de itens no extrato;
 
         // Validação quantidade de itens
-        if(extractCount == 0 || extractCount == null) extractCount = defaultValeuExtract; // trata caso o valor passado seja 0 ou nulo.
-        if(extractCount >= maximumValueExtract) extractCount = maximumValueExtract; // trata caso o valor seja maior que o máximo permitido.
+        if(lenth == 0 || lenth == null) lenth = defaultValeuExtract; // trata caso o valor passado seja 0 ou nulo.
+        if(lenth >= maximumValueExtract) lenth = maximumValueExtract; // trata caso o valor seja maior que o máximo permitido.
+    
 
-        var query = new List<string>();
+        try
+        {
+            var query = new List<string>();
 
-        var movements = await _context.Movements
+            var movements = await _context.Movements
                                 .Where(x => x.AccountId == accountId)
+                                .Skip(index)
+                                .Take(lenth)
                                 .Select(x => new MovementResult{
                                     Id = x.Id,
                                     AccountId = x.AccountId,
@@ -38,21 +43,16 @@ public class ExtractManager : IExtractManager
                                 })
                                 .ToListAsync();
 
-        foreach (var movement in movements)
+            foreach (var movement in movements)
+            {
+                query.Add(movement.Comments);
+            }
+            return query;
+        }
+        catch (Exception ex)
         {
-            query.Add(movement.Comments);
+            throw new ApplicationException("Exception thrown");
         }
 
-        // Validar indice de inicio
-        if(startIndex < 0 || startIndex == null) startIndex = 0;
-        if(startIndex >= query.Count)
-        {
-            var emptyList = new List<string>();
-            return emptyList;
-        }
-            
-        var result = query.GetRange(startIndex, extractCount);
-
-        return result;
     }
 }

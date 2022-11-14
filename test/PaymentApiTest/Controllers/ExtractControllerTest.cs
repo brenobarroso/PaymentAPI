@@ -1,6 +1,7 @@
 using api.Controllers;
 using api.Interfaces;
 using api.Models;
+using api.Models.Extract;
 using api.Models.Movements;
 using api.Models.Withdraws;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,11 @@ public class ExtractControllerTest
     public async Task ShouldListByAccountId()
     {
         // Arrange
+        var mockedViewModel = new ExtractViewModel{
+            Index = 0,
+            Length = 5
+        };
+        
         var id = new Random().Next();
                 var account = new Account{
             Id = 1,
@@ -126,7 +132,7 @@ public class ExtractControllerTest
         var extractController = new ExtractController(manager.Object);
 
         // Act
-        var result = (OkObjectResult)await extractController.GetByIdAsync(id, 0, 5);
+        var result = (OkObjectResult)await extractController.GetByIdAsync(id, mockedViewModel);
 
         // Assert
         Assert.Equal(200, result.StatusCode);
