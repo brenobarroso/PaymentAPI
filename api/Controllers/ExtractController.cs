@@ -22,7 +22,7 @@ public class ExtractController : ControllerBase
     {
         var movements = await _manager.GetByAccountIdAsync(accountId, viewModel.Index, viewModel.Length);
 
-        if(movements == null || movements.Count <= 1)
+        if(movements == null || movements.Count < 1)
             return NotFound($"Desculpa, não foram encontradas movimentações para conta {accountId}.");
 
         return Ok(movements);
