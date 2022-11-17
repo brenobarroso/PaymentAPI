@@ -124,10 +124,17 @@ public class ExtractControllerTest
             "String genérica.",
             "String genérica."
         };
+        var mockedResult = new ExtractResult{
+            Index = mockedViewModel.Index,
+            Length = mockedViewModel.Length,
+            Itens = movements,
+            Count = 5
+
+        };
         await _context.SaveChangesAsync();
 
         var manager = new Mock<IExtractManager>();
-        manager.Setup(x => x.GetByAccountIdAsync(id, 0, 5)).ReturnsAsync(movements);
+        manager.Setup(x => x.GetByAccountIdAsync(id, 0, 5)).ReturnsAsync(mockedResult);
 
         var extractController = new ExtractController(manager.Object);
 

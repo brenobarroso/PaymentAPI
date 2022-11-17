@@ -127,14 +127,11 @@ public class ExtractManagerTest
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(extractCount, result.Count);
-        Assert.All(result, 
+        Assert.Equal(extractCount, result.Itens.Count);
+        Assert.All(result.Itens, 
                     p => Assert.Equal("String genérica.", p.ToString()));
-    }
-
-    public async Task ShouldConvertExtractValue()
-    {
-
+        Assert.Equal(startIndex, result.Index);
+        Assert.Equal(5, result.Count);
     }
 
     public static string CreateRandomStringBySize(int size)
