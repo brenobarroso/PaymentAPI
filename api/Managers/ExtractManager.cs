@@ -67,5 +67,6 @@ public class ExtractManager : IExtractManager
             throw new ApplicationException("Exception thrown");
         }
 
+
     }
 }
