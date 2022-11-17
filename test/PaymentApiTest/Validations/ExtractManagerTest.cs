@@ -25,8 +25,18 @@ public class ExtractManagerTest
         _context.Database.EnsureCreated();
     }
 
-    [Fact]
-    public async Task ShouldListByAccountId()
+    [Theory]
+    [InlineData(1, 0, 1)]
+    [InlineData(1, 0, 2)]
+    [InlineData(1, 0, 3)]
+    [InlineData(1, 0, 4)]
+    [InlineData(1, 0, 5)]
+    [InlineData(1, 1, 1)]
+    [InlineData(1, 2, 3)]
+    [InlineData(1, 3, 2)]
+    [InlineData(1, 4, 1)]
+    [InlineData(1, 5, 0)]    
+    public async Task ShouldListByAccountId(int accountId, int startIndex, int extractCount)
     {
         // Arrange
         var manager = new ExtractManager(_context, _manager);
@@ -73,21 +83,55 @@ public class ExtractManagerTest
             AccountId = 2
         };
 
+        var movement4 = new Movement{
+            Date = DateTime.UtcNow,
+            Value = (decimal)1500m,
+            Comments = "String genérica.",
+            Withdraw = null,
+            Payment = new Payment(),
+            Account = account,
+            AccountId = account.Id
+        };
+
+        var movement5 = new Movement{
+            Date = DateTime.UtcNow,
+            Value = (decimal)1500m,
+            Comments = "String genérica.",
+            Withdraw = null,
+            Payment = new Payment(),
+            Account = account,
+            AccountId = account.Id
+        };
+
+        var movement6 = new Movement{
+            Date = DateTime.UtcNow,
+            Value = (decimal)1500m,
+            Comments = "String genérica.",
+            Withdraw = null,
+            Payment = new Payment(),
+            Account = account,
+            AccountId = account.Id
+        };
+
         account.Movements.Add(movement1);
         account.Movements.Add(movement2);
+        account.Movements.Add(movement4);
+        account.Movements.Add(movement5);
+        account.Movements.Add(movement6);
 
         _context.Accounts.Add(account);
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await manager.GetByAccountIdAsync(account.Id);
+        var result = await manager.GetByAccountIdAsync(accountId, startIndex, extractCount);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(2, result.Count);
-        Assert.Equal("String genérica.", result.First().ToString());
-        Assert.Equal("String genérica.", result.Last().ToString());
-
+        Assert.Equal(extractCount, result.Itens.Count);
+        Assert.All(result.Itens, 
+                    p => Assert.Equal("String genérica.", p.ToString()));
+        Assert.Equal(startIndex, result.Index);
+        Assert.Equal(5, result.Count);
     }
 
     public static string CreateRandomStringBySize(int size)
