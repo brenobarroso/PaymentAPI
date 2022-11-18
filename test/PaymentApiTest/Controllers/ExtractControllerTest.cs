@@ -33,7 +33,11 @@ public class ExtractControllerTest
         // Arrange
         var mockedViewModel = new ExtractViewModel{
             Index = 0,
-            Length = 5
+            Length = 5,
+            JustIn = false,
+            JustOut = false,
+            StartDate = null,
+            EndDate = null
         };
         
         var id = new Random().Next();
@@ -134,7 +138,7 @@ public class ExtractControllerTest
         await _context.SaveChangesAsync();
 
         var manager = new Mock<IExtractManager>();
-        manager.Setup(x => x.GetByAccountIdAsync(id, 0, 5)).ReturnsAsync(mockedResult);
+        manager.Setup(x => x.GetByAccountIdAsync(mockedViewModel, id)).ReturnsAsync(mockedResult);
 
         var extractController = new ExtractController(manager.Object);
 
