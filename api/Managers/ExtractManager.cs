@@ -1,3 +1,4 @@
+using System.Globalization;
 using api.Interfaces;
 using api.Models.Extract;
 using api.Models.Movements;
@@ -17,153 +18,67 @@ public class ExtractManager : IExtractManager
         _accountManager = accountManager;
     }
 
-    public Task<ExtractResult> GetByAccountIdAsync(ExtractViewModel viewModel, int accountId)
+    public async Task<ExtractResult> GetByAccountIdAsync(ExtractViewModel viewModel, int accountId)
     {
         int defaultValeuExtract = 60;
         int maximumValueExtract = 90;
+        var query = new List<string>();
 
         if(viewModel.Length == 0 || viewModel.Length == 0) viewModel.Length = defaultValeuExtract;
         if(viewModel.Length >= maximumValueExtract) viewModel.Length = maximumValueExtract;
     
         try
         {
-            if(viewModel.JustIn == true)
-            {
-                var resultIn = TakeJustIn(accountId, viewModel);
+            var count = await _context.Movements
+                                        .Where(x => x.AccountId == accountId)
+                                        .LongCountAsync();
+            var result = _context.Movements.Where(x => x.AccountId == accountId);
 
-                return resultIn;
-            }
+            if(viewModel.JustIn == true)
+                result.Where(x => x.Comments.Contains("entrada"));
 
             if(viewModel.JustOut == true)
+                result.Where(x => x.Comments.Contains("saída"));
+
+            if(viewModel.StartDate != null && viewModel.EndDate != null)
+                result.Where(x => x.Date >= viewModel.StartDate && x.Date <= viewModel.EndDate);
+
+            if(viewModel.StartDate != null)
+                result.Where(x => x.Date >= viewModel.StartDate);
+
+            if(viewModel.EndDate != null)
+                result.Where(x => x.Date <= viewModel.EndDate);
+
+            await result.Skip(viewModel.Index)
+                        .Take(viewModel.Length)
+                        .Select(x => new MovementResult{
+                            Id = x.Id,
+                            AccountId = x.AccountId,
+                            Date = x.Date,
+                            Value = x.Value,
+                            Comments = x.Comments
+                        })
+                        .ToListAsync();
+
+            foreach (var movement in result)
             {
-                var resultOut = TakeJustOut(accountId, viewModel);
-
-                return resultOut;
+                    query.Add(movement.Comments);
             }
+            
+            await _context.SaveChangesAsync();
 
-            var result = Take(accountId, viewModel);
+            var extract = new ExtractResult{
+                Index = viewModel.Index,
+                Length = viewModel.Length,
+                Itens = query,
+                Count = count
+            };
 
-            return result;
+            return extract;
         }
         catch (Exception ex)
         {
             throw new ApplicationException("Exception thrown");
         }
-    }
-
-    public async Task<ExtractResult> TakeJustIn(int accountId, ExtractViewModel viewModel)
-    {
-        var query = new List<string>();
-
-        var count = await _context.Movements
-                                        .Where(x => x.AccountId == accountId)
-                                        .LongCountAsync();
-
-        var movements = await _context.Movements
-                                .Where(x => x.AccountId == accountId)
-                                .Where(x => x.Comments.Contains("entrada"))
-                                .Skip(viewModel.Index)
-                                .Take(viewModel.Length)
-                                .Select(x => new MovementResult{
-                                    Id = x.Id,
-                                    AccountId = x.AccountId,
-                                    Date = x.Date,
-                                    Value = x.Value,
-                                    Comments = x.Comments
-                                })
-                                .ToListAsync();
-
-        foreach (var movement in movements)
-        {
-                query.Add(movement.Comments);
-        }
-
-        await _context.SaveChangesAsync();
-
-        var resultIn = new ExtractResult{
-        Index = viewModel.Index,
-        Length = viewModel.Length,
-        Itens = query,
-        Count = count
-        };
-
-        return resultIn;
-    }
-
-    public async Task<ExtractResult> TakeJustOut(int accountId, ExtractViewModel viewModel)
-    {
-        var query = new List<string>();
-
-        var count = await _context.Movements
-                                        .Where(x => x.AccountId == accountId)
-                                        .LongCountAsync();
-
-        var movements = await _context.Movements
-                                .Where(x => x.AccountId == accountId)
-                                .Where(x => x.Comments.Contains("saída"))
-                                .Skip(viewModel.Index)
-                                .Take(viewModel.Length)
-                                .Select(x => new MovementResult{
-                                    Id = x.Id,
-                                    AccountId = x.AccountId,
-                                    Date = x.Date,
-                                    Value = x.Value,
-                                    Comments = x.Comments
-                                })
-                                .ToListAsync();
-
-        foreach (var movement in movements)
-        {
-                query.Add(movement.Comments);
-        }
-
-        await _context.SaveChangesAsync();
-
-        var resultOut = new ExtractResult{
-        Index = viewModel.Index,
-        Length = viewModel.Length,
-        Itens = query,
-        Count = count
-        };
-
-        return resultOut;
-    }
-
-    public async Task<ExtractResult> Take(int accountId, ExtractViewModel viewModel)
-    {
-        var query = new List<string>();
-
-        var count = await _context.Movements
-                                        .Where(x => x.AccountId == accountId)
-                                        .LongCountAsync();
-
-        var movements = await _context.Movements
-                                .Where(x => x.AccountId == accountId)
-                                .Skip(viewModel.Index)
-                                .Take(viewModel.Length)
-                                .Select(x => new MovementResult{
-                                    Id = x.Id,
-                                    AccountId = x.AccountId,
-                                    Date = x.Date,
-                                    Value = x.Value,
-                                    Comments = x.Comments
-                                })
-                                .ToListAsync();
-
-        foreach (var movement in movements)
-        {
-                query.Add(movement.Comments);
-        }
-        
-        await _context.SaveChangesAsync();
-
-        var result = new ExtractResult{
-        Index = viewModel.Index,
-        Length = viewModel.Length,
-        Itens = query,
-        Count = count
-        };
-
-        return result;
     }
 }
