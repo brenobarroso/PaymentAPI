@@ -5,5 +5,5 @@ namespace api.Interfaces;
 
 public interface IExtractManager
 {
-    Task<ExtractResult> GetByAccountIdAsync(int accountId, int startIndex, int extractCount);
+    Task<ExtractResult> GetByAccountIdAsync(ExtractViewModel viewModel, int accountId);
 }    
