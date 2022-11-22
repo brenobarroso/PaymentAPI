@@ -1,9 +1,9 @@
-using System.Globalization;
 using api.Interfaces;
 using api.Models.Extract;
 using api.Models.Movements;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Data;
+using System;
 
 namespace api.Managers;
 
@@ -22,47 +22,61 @@ public class ExtractManager : IExtractManager
     {
         int defaultValeuExtract = 60;
         int maximumValueExtract = 90;
-        var query = new List<string>();
+        var result = new List<string>();
 
-        if(viewModel.Length == 0 || viewModel.Length == 0) viewModel.Length = defaultValeuExtract;
+        //tratamento
+        
+
+        if(viewModel.Length == 0 || viewModel.Length <= 0) viewModel.Length = defaultValeuExtract;
         if(viewModel.Length >= maximumValueExtract) viewModel.Length = maximumValueExtract;
     
         try
         {
-            var count = await _context.Movements
-                                        .Where(x => x.AccountId == accountId)
-                                        .LongCountAsync();
-            var result = _context.Movements.Where(x => x.AccountId == accountId);
+            var parsedStartDate = viewModel.StartDate?.ToUniversalTime().Date;
+            var parsedEndDate = viewModel.EndDate?.ToUniversalTime().Date;
 
+            var query = _context.Movements
+                                .Where(x => x.AccountId == accountId);
+
+            var count = await query.LongCountAsync();
+                                    
             if(viewModel.JustIn == true)
-                result.Where(x => x.Comments.Contains("entrada"));
+                query = query.Where(x => x.Comments.Contains("entrada"));
 
             if(viewModel.JustOut == true)
-                result.Where(x => x.Comments.Contains("saída"));
+                query = query.Where(x => x.Comments.Contains("saída"));
 
-            if(viewModel.StartDate != null && viewModel.EndDate != null)
-                result.Where(x => x.Date >= viewModel.StartDate && x.Date <= viewModel.EndDate);
-
-            if(viewModel.StartDate != null)
-                result.Where(x => x.Date >= viewModel.StartDate);
-
-            if(viewModel.EndDate != null)
-                result.Where(x => x.Date <= viewModel.EndDate);
-
-            await result.Skip(viewModel.Index)
-                        .Take(viewModel.Length)
-                        .Select(x => new MovementResult{
-                            Id = x.Id,
-                            AccountId = x.AccountId,
-                            Date = x.Date,
-                            Value = x.Value,
-                            Comments = x.Comments
-                        })
-                        .ToListAsync();
-
-            foreach (var movement in result)
+            if(viewModel.StartDate.HasValue && viewModel.EndDate.HasValue)
             {
-                    query.Add(movement.Comments);
+                if(viewModel.StartDate == viewModel.EndDate)
+                    query = query.Where(x => x.Date.Date == parsedStartDate);
+
+                query = query.Where(x => x.Date.Date >= parsedStartDate);
+                query = query.Where(x => x.Date.Date <= parsedEndDate);
+
+            }
+
+            if(viewModel.StartDate.HasValue && (viewModel.EndDate.HasValue == false))
+                query = query.Where(x => x.Date.Date >= parsedStartDate);
+
+            if(viewModel.EndDate.HasValue && (viewModel.StartDate.HasValue == false))
+                query = query.Where(x => x.Date.Date <= parsedEndDate);
+
+            var list = await query
+                            .Skip(viewModel.Index)
+                            .Take(viewModel.Length)
+                            .Select(x => new MovementResult{
+                                    Id = x.Id,
+                                    AccountId = x.AccountId,
+                                    Date = x.Date,
+                                    Value = x.Value,
+                                    Comments = x.Comments
+                                })
+                            .ToListAsync();
+
+            foreach (var movement in list)
+            {
+                    result.Add(movement.Comments);
             }
             
             await _context.SaveChangesAsync();
@@ -70,7 +84,7 @@ public class ExtractManager : IExtractManager
             var extract = new ExtractResult{
                 Index = viewModel.Index,
                 Length = viewModel.Length,
-                Itens = query,
+                Itens = result,
                 Count = count
             };
 
