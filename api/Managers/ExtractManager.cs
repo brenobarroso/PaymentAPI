@@ -3,6 +3,7 @@ using api.Models.Extract;
 using api.Models.Movements;
 using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Data;
+using System;
 
 namespace api.Managers;
 
@@ -17,55 +18,81 @@ public class ExtractManager : IExtractManager
         _accountManager = accountManager;
     }
 
-    public async Task<ExtractResult> GetByAccountIdAsync(int accountId, int index, int length)
+    public async Task<ExtractResult> GetByAccountIdAsync(ExtractViewModel viewModel, int accountId)
     {
-        int defaultValeuExtract = 10; // valor default da quantidade de itens no extrato;
-        int maximumValueExtract = 90; // valor maximo da quantidade de itens no extrato;
+        int defaultValeuExtract = 60;
+        int maximumValueExtract = 90;
+        var result = new List<string>();
 
-        // Validação quantidade de itens
-        if(length == 0 || length == null) length = defaultValeuExtract; // trata caso o valor passado seja 0 ou nulo.
-        if(length >= maximumValueExtract) length = maximumValueExtract; // trata caso o valor seja maior que o máximo permitido.
+        //tratamento
+        
+
+        if(viewModel.Length == 0 || viewModel.Length <= 0) viewModel.Length = defaultValeuExtract;
+        if(viewModel.Length >= maximumValueExtract) viewModel.Length = maximumValueExtract;
     
-
         try
         {
-            var query = new List<string>();
+            var parsedStartDate = viewModel.StartDate?.ToUniversalTime().Date;
+            var parsedEndDate = viewModel.EndDate?.ToUniversalTime().Date;
 
-            var movements = await _context.Movements
-                                .Where(x => x.AccountId == accountId)
-                                .Skip(index)
-                                .Take(length)
-                                .Select(x => new MovementResult{
+            var query = _context.Movements
+                                .Where(x => x.AccountId == accountId);
+
+            var count = await query.LongCountAsync();
+                                    
+            if(viewModel.JustIn == true)
+                query = query.Where(x => x.Comments.Contains("entrada"));
+
+            if(viewModel.JustOut == true)
+                query = query.Where(x => x.Comments.Contains("saída"));
+
+            if(viewModel.StartDate.HasValue && viewModel.EndDate.HasValue)
+            {
+                if(viewModel.StartDate == viewModel.EndDate)
+                    query = query.Where(x => x.Date.Date == parsedStartDate);
+
+                query = query.Where(x => x.Date.Date >= parsedStartDate);
+                query = query.Where(x => x.Date.Date <= parsedEndDate);
+
+            }
+
+            if(viewModel.StartDate.HasValue && (viewModel.EndDate.HasValue == false))
+                query = query.Where(x => x.Date.Date >= parsedStartDate);
+
+            if(viewModel.EndDate.HasValue && (viewModel.StartDate.HasValue == false))
+                query = query.Where(x => x.Date.Date <= parsedEndDate);
+
+            var list = await query
+                            .Skip(viewModel.Index)
+                            .Take(viewModel.Length)
+                            .Select(x => new MovementResult{
                                     Id = x.Id,
                                     AccountId = x.AccountId,
                                     Date = x.Date,
                                     Value = x.Value,
                                     Comments = x.Comments
                                 })
-                                .ToListAsync();
+                            .ToListAsync();
 
-            foreach (var movement in movements)
+            foreach (var movement in list)
             {
-                query.Add(movement.Comments);
+                    result.Add(movement.Comments);
             }
+            
+            await _context.SaveChangesAsync();
 
-            var count = await _context.Movements
-                                        .Where(x => x.AccountId == accountId)
-                                        .LongCountAsync();
-
-            var result = new ExtractResult{
-                Index = index,
-                Length = length,
-                Itens = query,
+            var extract = new ExtractResult{
+                Index = viewModel.Index,
+                Length = viewModel.Length,
+                Itens = result,
                 Count = count
             };
 
-            return result;
+            return extract;
         }
         catch (Exception ex)
         {
             throw new ApplicationException("Exception thrown");
         }
-
     }
 }
